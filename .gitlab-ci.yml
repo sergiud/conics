@@ -1,0 +1,31 @@
+default:
+  tags:
+    - docker
+  image: ubuntu:rolling
+
+before_script:
+  - apt-get update
+  - DEBIAN_FRONTEND=noninteractive
+    apt-get install -y
+    make
+    python3-coverage
+    python3-matplotlib
+    python3-numpy
+    python3-pillow
+    python3-pytest
+    python3-scipy
+    python3-sphinx
+    python3-sphinxcontrib.bibtex
+
+build:
+  stage: build
+  script:
+    - make SPHINXBUILD='python3 -m sphinx' -C docs/ html
+
+test:
+  stage: test
+  script:
+    - python3-coverage run --source=conics/ -m pytest
+    - python3-coverage report
+  needs: []
+  coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
