@@ -2,7 +2,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2019 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2022 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,19 +61,11 @@ def test_foo():
 
     R, t, n, c, s1, s2, s3, mask = estimate_pose(CC, r, -angle/2)
 
-    print('R')
-    #print(R0.T)
-    #print(R[mask])
-
     diffs = R[mask] - R0.T
-    print('diffs', diffs)
     fn = np.linalg.norm(diffs, 'fro', axis=(1, 2))
-    print(fn)
 
     inv_c = tc.transform(R[mask][0])
 
-    print(c0)
-    print(inv_c)
 
 def test_construction():
     c1 = Conic(1, 2, 3, 4, 5, 6)
@@ -257,17 +249,22 @@ def test_single_circle_intersection():
     c2 = Conic.from_circle([2, 0], 1)
 
     inter = c1.intersect(c2)
-
-    assert inter.shape[1] == 2
+    den = inter[-1, ...]
+    inter = np.real(inter[..., np.isreal(den)])
+    # Remove duplicate columns
+    inter = np.unique(inter, axis=1)
 
     hinter = hnormalized(inter)
+    hinter = np.unique(hinter, axis=1)
 
-    np.testing.assert_equal(hinter, np.array([[1, 1], [0, 0]]))
+    assert hinter.shape[1] == 1
+
+    np.testing.assert_equal(hinter, np.array([[1], [0]]))
 
     c = c1 - c2
 
-    np.testing.assert_array_equal(c(inter), np.zeros((2, )))
-    np.testing.assert_array_equal(c(hinter), np.zeros((2, )))
+    np.testing.assert_array_almost_equal(c(inter), 0)
+    np.testing.assert_array_almost_equal(c(hinter), 0)
 
 def test_conic_from_homogeneous_non_symmetric():
     Q = np.arange(9).reshape(3, 3)
@@ -292,3 +289,13 @@ def test_circle_scale_non_uniform():
 
     np.testing.assert_array_almost_equal(center.ravel(), [2, 8])
     np.testing.assert_array_almost_equal(major_minor.ravel(), [20, 10])
+
+def test_complex_circle_intersection():
+    c1 = Conic.from_circle([0, 0], 1)
+    c2 = Conic.from_circle([3, 0], 1)
+
+    c = c1 - c2
+
+    inter = c1.intersect(c2)
+
+    np.testing.assert_almost_equal(c(inter), 0)

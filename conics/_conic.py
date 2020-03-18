@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2019 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2022 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -331,32 +331,13 @@ class Conic:
 
         poly = np.array([alpha, beta, gamma, delta])
         La = np.roots(poly)
-
-        La = np.real(La[np.isreal(La)])
-
-        if La.size == 0:
-            return np.array([])
-
-        PP = np.array([])
+        PP = np.empty_like(poly, shape=(3, 0))
 
         for la in La:
             P = Conic.__intersect(la, A, B)
+            PP = np.column_stack((PP, P))
 
-            if P.size != 0:
-                if PP.size == 0:
-                    PP = P
-                else:
-                    PP = np.concatenate((PP, P), axis=1)
-
-            if np.prod(np.shape(PP)) == 0:
-                break
-
-            assert len(np.shape(PP)) == 2
-            assert PP.shape[1] <= 4, 'conic can intersect in up to 4 points only'
-
-            # We determined all intersections
-            if PP.shape[1] == 4:
-                break
+        PP = np.unique(PP, axis=1)
 
         return PP
 
@@ -377,15 +358,16 @@ class Conic:
         # Diagonal element close to zero indicates that the conic cannot be
         # decomposed since this causes a division by zero.
         if np.isclose(BB_diag[i], 0):
-            return np.array([])
+            return np.empty_like(BB_diag, shape=(0, 3))
 
         # NOTE There's a typo in the book; a minus in the sqrt term is missing.
-        val = -BB[i, i]
+        bb2 = -BB[i, i]
 
-        if val < 0:
-            return np.array([])
+        if bb2 < 0:
+            bb2 = np.complex_(bb2)
 
-        bb = np.sqrt(val)
+        bb = np.sqrt(bb2)
+
         p = BB[:, i] / bb
 
         M_p = skew_symmetric(p)
@@ -394,7 +376,7 @@ class Conic:
         i, j = np.unravel_index(np.argmax(CC**2), CC.shape)
 
         if np.any(np.isclose(CC[i, j], 0)):
-            return np.array([])
+            return np.empty_like(CC, shape=(0, 3))
 
         # Lines consituting the degenerate conic
         g = CC[i, :]
@@ -403,30 +385,16 @@ class Conic:
         P1 = Conic.__intersect_line(A, g)
         P2 = Conic.__intersect_line(A, h)
 
-        if P1.size == 0 and P2.size == 0:
-            return np.array([])
+        P = np.column_stack((P1, P2))
 
-        if P1.size != 0:
-            nonzero1 = ~np.isclose(P1[-1, :], 0)
-            P1 = P1[:, nonzero1]
-
-        if P2.size != 0:
-            nonzero2 = ~np.isclose(P2[-1, :], 0)
-            P2 = P2[:, nonzero2]
-
-        if P1.size == 0:
-            return P2
-
-        if P2.size == 0:
-            return P1
-
-        return np.concatenate((P1, P2), axis=1)
+        nonzero = ~np.isclose(P[-1, :], 0)
+        return P[:, nonzero]
 
     def __intersect_line(A, g):
         l, u, t = g
 
         if np.isclose(t, 0):
-            return np.array([])
+            return np.empty_like(t, shape=(0, 3))
 
         M_l = skew_symmetric(g)
         B = M_l.T @ A @ M_l
@@ -436,7 +404,7 @@ class Conic:
                 np.array([[B[0, 0], B[0, 1]], [B[0, 1], B[1, 1]]]))
 
         if D < 0:
-            return np.array([])
+            D = np.complex_(D)
 
         aa = 1 / t * np.sqrt(D)
         C = B + aa * M_l
@@ -450,7 +418,7 @@ class Conic:
         P1 = C[i, :]
         P2 = C[:, j]
 
-        return np.stack((P1, P2), axis=1)
+        return np.column_stack((P1, P2))
 
     def __factors():
         return np.array([1, 2, 1, 2, 2, 1])
