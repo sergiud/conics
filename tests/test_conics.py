@@ -292,27 +292,3 @@ def test_circle_scale_non_uniform():
 
     np.testing.assert_array_almost_equal(center.ravel(), [2, 8])
     np.testing.assert_array_almost_equal(major_minor.ravel(), [20, 10])
-
-def test_parabola_conversion1():
-    c = Conic.from_parabola([1, 2], 1, np.pi/2)
-    vertex, p, alpha = c.to_parabola()
-
-    np.testing.assert_array_almost_equal(vertex, [1, 2])
-    np.testing.assert_approx_equal(p, 1)
-    np.testing.assert_approx_equal(alpha, np.pi/2)
-
-def test_parabola_conversion2():
-    c = Conic.from_parabola([1, 2], 1, -np.pi/2)
-    vertex, p, alpha = c.to_parabola()
-
-    np.testing.assert_array_almost_equal(vertex, [1, 2])
-    np.testing.assert_approx_equal(p, 1)
-    np.testing.assert_approx_equal(alpha, -np.pi/2)
-
-def test_parabola_conversion3():
-    c = Conic.from_parabola([1, 2], -1, -np.pi/2)
-    vertex, p, alpha = c.to_parabola()
-
-    np.testing.assert_array_almost_equal(vertex, [1, 2])
-    np.testing.assert_approx_equal(p, 1)
-    np.testing.assert_approx_equal(alpha, np.pi/2)

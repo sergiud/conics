@@ -26,3 +26,4 @@ from ._conic import Conic
 from ._conic import estimate_pose
 from ._conic import projected_center
 from ._conic import surface_normal
+from ._parabola import Parabola

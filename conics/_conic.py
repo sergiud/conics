@@ -764,7 +764,7 @@ class Conic:
         return np.row_stack((dx, dy))
 
 
-if True:
+if False:
     A1 = _make_circle([5, 5], 20)
     A2 = _make_circle([5.01, 5], 10)
 
