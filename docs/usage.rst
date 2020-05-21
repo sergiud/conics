@@ -42,6 +42,12 @@ products.
     :members:
 
 
+Fitting
+=======
+
+.. autofunction:: conics.fitting.fit_nievergelt
+
+
 Pose Estimation
 ===============
 
