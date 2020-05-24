@@ -84,7 +84,7 @@ class Parabola:
             f5 = np.ravel(0.5 * (y**2 - 2 * self.p * x))
             f6 = np.ravel(y * (xi - x) + self.p * (yi - y))
 
-            return *f5, *f6  # np.stack((f5, f6)).ravel()
+            return np.ravel([f5, f6])  # np.stack((f5, f6)).ravel()
 
         pts2 = np.empty_like(pts1)
 
