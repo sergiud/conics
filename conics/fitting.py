@@ -23,6 +23,27 @@ from .geometry import line_through
 import numpy as np
 
 
+def fit_dlt(pts):
+    """Fits an arbitrary conic using direct linear transform (DLT)
+    :cite:`Hartley2004` to the specified 2-D coordinates given by `pts`.
+
+    The resulting conic is not guaranteed to be of any specific type.
+
+    :param pts: A set of 2-D coordinates to fit the conic to.
+    :type pts: numpy.ndarray
+
+    :return: The estimated conic.
+    :rtype: conics.Conic
+    """
+    x, y = pts
+
+    A = np.column_stack((x**2, x*y, y**2, x, y, np.ones_like(x)))
+
+    u, s, vt = np.linalg.svd(A)
+
+    return Conic(vt.T[:, -1])
+
+
 def parabola_to_bezier(parabola, start, end):
     R"""Determines the control points of a quadratic Bezier curve that exactly
     represents given `parabola`.
@@ -117,6 +138,8 @@ if __name__ == '__main__':
     #pts[1] *= 1e-2
     #C = fit_nievergelt(pts, type='hyperbola')
     C = fit_nievergelt(pts, type='parabola', scale=True)
+
+    C = C.constrain(pts, fix_angle=np.pi/4)
 
     vertex, p, alpha = C.to_parabola()
     pb = Parabola(vertex, p, alpha)

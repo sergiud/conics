@@ -54,26 +54,10 @@ A parabola is a specific instance of a conic section.
 Fitting
 =======
 
-The Importance of Normalization
--------------------------------
-
-Standardizing the 2-D coordinates to be mean-free with unit standard deviation
-may improve the numerical robustness of the fitting algorithm
-:cite:`Chojnacki2003,Harker2004`.
-
-.. plot:: ../examples/normalization.py
-
-   The effect of normalizati on (algebraic) fit of a parabola.
-
-In this example, the large range of the vertical axis dominates over the much
-smaller range of the horizontal axis. Without scaling, the algebraic fit
-therefore produces an elongated parabola that covers the predominant vertical
-axis. While this is a valid solution, it is perceptually inferior to the one
-estimated using normalized coordinates.
-
-
 Algebraic Fitting
 -----------------
+
+.. autofunction:: conics.fitting.fit_dlt
 
 .. autofunction:: conics.fitting.fit_nievergelt
 
@@ -116,6 +100,34 @@ the intersection of the parabola slopes at the outer control points.
 .. autofunction:: conics.fitting.parabola_to_bezier
 
 .. plot:: ../examples/bezier.py
+
+
+The Importance of Normalization
+-------------------------------
+
+Standardizing the 2-D coordinates to be mean-free with unit standard deviation
+may improve the numerical robustness of the fitting algorithm
+:cite:`Chojnacki2003,Harker2004`.
+
+.. plot:: ../examples/normalization.py
+
+   The effect of normalizati on (algebraic) fit of a parabola.
+
+In this example, the large range of the vertical axis dominates over the much
+smaller range of the horizontal axis. Without scaling, the algebraic fit
+therefore produces an elongated parabola that covers the predominant vertical
+axis. While this is a valid solution, it is perceptually inferior to the one
+estimated using normalized coordinates.
+
+
+Constraining Conics
+-------------------
+
+Sometimes, one wishes to refine an already fitted conic with respect to a set of
+points to obtain a conic of specific type or with specific properties. For
+instance, the conic obtained using direct linear transform (DLT) results in a
+circle. However, one wants a parabola instead.
+
 
 
 Pose Estimation

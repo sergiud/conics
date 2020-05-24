@@ -16,6 +16,7 @@
 # limitations under the License.
 
 from .geometry import rot2d
+from scipy.optimize import least_squares
 import itertools
 import numpy as np
 import scipy.linalg
@@ -762,6 +763,98 @@ class Conic:
         dy = b*x+2*c*y+e
 
         return np.row_stack((dx, dy))
+
+    def constrain(self, pts, type='parabola', fix_angle=False):
+        R"""Conditions the conic to a specific type and specific properties.
+
+        :param pts: :math:`n` 2-D coordinates given by a :math:`2\times n` matrix
+            where each coordinate is store in a column. The conditioning is
+            performed with respect to the specified coordinates.
+        :type pts: numpy.ndarray
+
+        :param type: Desired conic type. Possible choice is only ``parabola``.
+        :type type: str
+
+        :param fix_angle: Specifies whether to fix the angle to the current
+            configuration or use a specific value given by the argument in
+            radians.
+        :type fix_angle: bool, float
+
+        :return: The constrained conic.
+        :rtype: conics.Conic
+        """
+
+        if type != 'parabola':
+            raise ValueError(
+                'constraining conic to anything else than a parabola is not supported yet')
+
+        return self.__constrain_parabola(pts, fix_angle)
+
+    def __constrain_parabola(self, pts, fix_angle=False, w8=1e6, w9=1e6, w10=1e6):
+        x0 = self.coeffs_ / Conic.__factors()
+
+        if not isinstance(fix_angle, bool) or fix_angle:
+            A, B, C, D, E, F = x0
+
+            if not isinstance(fix_angle, bool):
+                alpha = fix_angle
+                c1 = np.sin(alpha)
+                c2 = np.cos(alpha)
+            else:
+                den = np.hypot(A, B)
+                c1 = A / den
+                c2 = -B / den
+
+            fix_angle = True
+
+        def fun(a, pts):
+            x, y = pts
+            A, B, C, D, E, F = a  # / Conic.__factors()
+
+            f = np.column_stack(
+                (x**2, 2*x*y, y**2, 2*x, 2*y, np.ones_like(x))) * a[np.newaxis, ...]
+            f7 = np.sum(f, axis=1)
+
+            residuals = np.stack((*f7, w8*(B**2-A*C), w9*(A + C - 1)))
+
+            if fix_angle:
+                t = np.hypot(A, B)
+                residuals = np.stack(
+                    (*residuals, w10*(A - c1*t), w10*(B+c2*t)))
+
+            return residuals
+
+        def jac(a, pts):
+            x, y = pts
+            A, B, C, D, E, F = a  # / Conic.__factors()
+
+            top = np.column_stack(
+                (x**2, 2*x*y, y**2, 2*x, 2*y, np.ones_like(x)))
+            bl = np.array([
+                [-w8*C, 2*w8*B, -w8*A],
+                [w9, 0, w9]])
+            br = np.zeros_like(bl)
+
+            J = np.block([[top],
+                          [bl, br]])
+
+            if fix_angle:
+                bl = np.array([
+                    [w10*c2**2, w10*c1*c2, 0],
+                    [w10*c1*c2, w10*c1**2, 0]])
+                br = np.zeros_like(bl)
+
+                J = np.block([[J],
+                              [bl, br]])
+
+            return J
+
+        r = least_squares(fun, x0, args=(pts, ), jac=jac)
+        print(r)
+
+        coeffs = r.x * Conic.__factors()
+
+        return Conic(coeffs)
 
 
 if False:
