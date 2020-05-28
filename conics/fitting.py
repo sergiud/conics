@@ -15,8 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ._nievergelt import fit_nievergelt
 from ._conic import Conic
+from ._harker import fit_harker
+from ._nievergelt import fit_nievergelt
 from .geometry import hnormalized
 from .geometry import line_intersection
 from .geometry import line_through
