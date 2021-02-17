@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+from conics import Conic
 from conics import Ellipse
 from conics.fitting import fit_dlt
 from conics.fitting import fit_nievergelt
@@ -42,3 +43,27 @@ def test_ellipse_fitting():
     sse2 = np.inner(values2, values2)
 
     assert sse2 <= sse1
+    # print(e.center, e.major_minor, e.alpha)
+
+    e1 = e.refine(pts)
+    print(e1.center, e1.major_minor, e1.alpha)
+
+
+def test_circle():
+    c = Conic.from_circle([1, 2], 3)
+    C = 4 * c.homogeneous
+
+    c1 = Conic.from_homogeneous(C)
+
+    x0, r = c1.to_circle()
+    np.testing.assert_array_almost_equal(x0, [[1], [2]])
+    np.testing.assert_almost_equal(r, 3)
+
+
+def test_circle_not_circle():
+    c = Conic.from_ellipse([1, 2], [4, 3], 0.1)
+    C = 4 * c.homogeneous
+    c1 = Conic.from_homogeneous(C)
+
+    with np.testing.assert_raises(ValueError):
+        c1.to_circle()

@@ -496,6 +496,46 @@ class Conic:
         x0 = self.__center(C33)
         return a2g(x0, C33, self.coeffs_[-1])
 
+    def to_circle(self):
+        """Converts the conic to a circle.
+
+        If the conic section does not represent a circle, an exception will be
+        thrown.
+
+        Returns
+        -------
+        x0 : numpy.ndarray
+            The circle center
+        r : float
+            The circle radius.
+
+        Raises
+        ------
+        ValueError
+            Raised if the instance does not represent a circle.
+        """
+        C33 = self.__C33
+        x0 = self.__center(C33)
+        f = self.coeffs_[-1]
+
+        tmp = C33 - np.diag(np.diagonal(C33))
+
+        if np.any(~np.isclose(tmp, 0)):
+            raise ValueError('conic is not a circle')
+
+        det = np.linalg.det(C33)
+        s = np.sqrt(det)
+        # f = s(x0.T @ x0 - r^2)
+        # f/s = x0.T @ x0 - r^2
+        # f/s - x0.T @ x0 = -r^2
+        # r^2 = x0.T @ x0 - f/s
+        r2 = np.dot(x0.T, x0) - f / s
+
+        assert r2 > 0
+        r = np.sqrt(r2)
+
+        return x0, r
+
     @staticmethod
     def from_homogeneous(Q):
         r"""Constructs a conic section from its homogeneous :math:`3\times3`
