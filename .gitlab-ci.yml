@@ -25,7 +25,15 @@ build:
 test:
   stage: test
   script:
-    - python3-coverage run --source=conics/ -m pytest
+    - python3-coverage run --source=conics/
+      -m pytest
+      --junitxml pytest.xml
     - python3-coverage report
+    - python3-coverage xml
   needs: []
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
+  artifacts:
+    when: always
+    reports:
+      cobertura: coverage.xml
+      junit: pytest.xml
