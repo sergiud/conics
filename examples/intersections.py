@@ -37,9 +37,7 @@ c3 = Conic.from_circle([0, 0], 1)
 c4 = c3.translate([2*1, 0])
 
 inter1 = hnormalized(c1.intersect(c2))
-
 inter2 = hnormalized(e1.intersect(e2))
-
 inter3 = hnormalized(c3.intersect(c4))
 
 fig = plt.figure()

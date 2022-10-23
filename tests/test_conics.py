@@ -259,7 +259,7 @@ def test_single_circle_intersection():
 
     assert hinter.shape[1] == 1
 
-    np.testing.assert_equal(hinter, np.array([[1], [0]]))
+    np.testing.assert_array_almost_equal(hinter, [[1], [0]])
 
     c = c1 - c2
 

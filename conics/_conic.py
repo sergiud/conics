@@ -113,7 +113,7 @@ def cofactor(A):
 def adjugate(C):
     det = np.linalg.det(C)
 
-    if np.isclose(det, 0):
+    if det == 0:
         return np.transpose(cofactor(C))
 
     return np.linalg.inv(C).T * det
@@ -357,9 +357,9 @@ class Conic:
         # Select the diagonal element with the largest magnitude
         i = np.argmax(BB_diag)
 
-        # Diagonal element close to zero indicates that the conic cannot be
+        # Diagonal element being zero indicates that the conic cannot be
         # decomposed since this causes a division by zero.
-        if np.isclose(BB_diag[i], 0):
+        if BB_diag[i] == 0:
             return np.empty_like(BB_diag, shape=(3, 0))
 
         # NOTE There's a typo in the book; a minus in the sqrt term is missing.
@@ -377,7 +377,7 @@ class Conic:
 
         i, j = np.unravel_index(np.argmax(CC**2), CC.shape)
 
-        if np.any(np.isclose(CC[i, j], 0)):
+        if CC[i, j] == 0:
             return np.empty_like(CC, shape=(3, 0))
 
         # Lines consituting the degenerate conic
@@ -387,7 +387,10 @@ class Conic:
         P1 = Conic.__intersect_line(A, g)
         P2 = Conic.__intersect_line(A, h)
 
-        P = np.column_stack((P1, P2))
+        if P1.shape == P2.shape and np.all(np.isclose(P1, P2)):
+            P = P1
+        else:
+            P = np.column_stack((P1, P2))
 
         nonzero = ~np.isclose(P[-1, :], 0)
         return P[:, nonzero]
@@ -395,7 +398,7 @@ class Conic:
     def __intersect_line(A, g):
         l, u, t = g
 
-        if np.isclose(t, 0):
+        if t == 0:
             return np.empty_like(t, shape=(3, 0))
 
         M_l = skew_symmetric(g)
@@ -407,7 +410,7 @@ class Conic:
         if D < 0:
             D = np.complex128(D)
 
-        aa = 1 / t * np.sqrt(D)
+        aa = np.sqrt(D) / t
         C = B + aa * M_l
 
         l2_r = np.linalg.norm(C, axis=1)
@@ -418,6 +421,9 @@ class Conic:
 
         P1 = C[i, :]
         P2 = C[:, j]
+
+        if np.all(np.isclose(P1, P2)):
+            return P1
 
         return np.column_stack((P1, P2))
 
