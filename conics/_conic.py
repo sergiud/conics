@@ -397,11 +397,10 @@ class Conic:
             return np.empty_like(t, shape=(3, 0))
 
         M_l = skew_symmetric(g)
-        B = M_l.T @ A @ M_l
+        # B = np.linalg.multi_dot([M_l.T, A, M_l])
+        B = np.einsum('ji,jk,kl->il', M_l, A, M_l)
 
-        D = - \
-            np.linalg.det(
-                np.array([[B[0, 0], B[0, 1]], [B[0, 1], B[1, 1]]]))
+        D = -np.linalg.det(B[:2, :2])
 
         if D < 0:
             D = np.complex_(D)
