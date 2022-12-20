@@ -2,7 +2,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2019 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2022 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,9 +58,9 @@ extensions = [
     ]
 
 intersphinx_mapping = {
+        'numpy': ('https://numpy.org/doc/stable', None),
         'python': ('https://docs.python.org/3', None),
-        'numpy': ('https://docs.scipy.org/doc/numpy', None),
-        'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
+        'scipy': ('https://docs.scipy.org/doc/scipy', None),
     }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -77,8 +77,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Conics'
-copyright = "2020, Sergiu Deitsch"
-author = "Sergiu Deitsch"
+copyright = '2022, Sergiu Deitsch'
+author = 'Sergiu Deitsch'
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -94,7 +94,7 @@ release = conics.__version__
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -124,7 +124,7 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
 
 # -- Options for HTMLHelp output ---------------------------------------
