@@ -358,7 +358,7 @@ class Conic:
         # Diagonal element close to zero indicates that the conic cannot be
         # decomposed since this causes a division by zero.
         if np.isclose(BB_diag[i], 0):
-            return np.empty_like(BB_diag, shape=(0, 3))
+            return np.empty_like(BB_diag, shape=(3, 0))
 
         # NOTE There's a typo in the book; a minus in the sqrt term is missing.
         bb2 = -BB[i, i]
@@ -376,7 +376,7 @@ class Conic:
         i, j = np.unravel_index(np.argmax(CC**2), CC.shape)
 
         if np.any(np.isclose(CC[i, j], 0)):
-            return np.empty_like(CC, shape=(0, 3))
+            return np.empty_like(CC, shape=(3, 0))
 
         # Lines consituting the degenerate conic
         g = CC[i, :]
@@ -394,7 +394,7 @@ class Conic:
         l, u, t = g
 
         if np.isclose(t, 0):
-            return np.empty_like(t, shape=(0, 3))
+            return np.empty_like(t, shape=(3, 0))
 
         M_l = skew_symmetric(g)
         B = M_l.T @ A @ M_l
