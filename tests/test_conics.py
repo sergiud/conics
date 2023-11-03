@@ -1,4 +1,4 @@
-0#!/usr/bin/env python
+#!/usr/bin/env python
 
 # conics - Python library for dealing with conics
 #
