@@ -111,7 +111,7 @@ may improve the numerical robustness of the fitting algorithm
 
 .. plot:: ../examples/normalization.py
 
-   The effect of normalizati on (algebraic) fit of a parabola.
+   The effect of normalization on (algebraic) fit of a parabola.
 
 In this example, the large range of the vertical axis dominates over the much
 smaller range of the horizontal axis. Without scaling, the algebraic fit

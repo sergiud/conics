@@ -49,7 +49,7 @@ def parabola_to_bezier(parabola, start, end):
     R"""Determines the control points of a quadratic Bezier curve that exactly
     represents given `parabola`.
 
-    :param parabola: A parabole whose Bezier control points should be
+    :param parabola: A parabola whose Bezier control points should be
         determined.
     :type parabola: conics.Parabola
 
