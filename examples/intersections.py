@@ -24,7 +24,7 @@ import numpy as np
 
 def as_ellipse(c, **kwargs):
     x0, major_minor, angle = c.to_ellipse()
-    return Ellipse(x0, *major_minor.ravel() * 2, np.rad2deg(angle), **kwargs)
+    return Ellipse(x0, *major_minor.ravel() * 2, angle=np.rad2deg(angle), **kwargs)
 
 
 c1 = Conic.from_circle([0, 0], 1)
