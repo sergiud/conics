@@ -337,9 +337,11 @@ class Conic:
             P = Conic.__intersect(la, A, B)
             PP = np.column_stack((PP, P))
 
-        PP = np.unique(PP, axis=1)
+        # Use points that consists of real values only
+        mask = ~np.any(~np.isclose(np.imag(PP), 0), axis=0)
+        PP = np.unique(PP[..., mask], axis=1)
 
-        return PP
+        return np.real(PP)
 
     def __intersect(la, A, B):
         # Set mu arbitrarily to 1 and compute the degenerate conic using the
