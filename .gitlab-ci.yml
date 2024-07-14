@@ -1,35 +1,21 @@
 default:
   tags:
     - docker
-  image: ubuntu:rolling
-
-before_script:
-  - apt-get update
-  - DEBIAN_FRONTEND=noninteractive
-    apt-get install -y
-    make
-    python3-coverage
-    python3-matplotlib
-    python3-numpy
-    python3-pillow
-    python3-pytest
-    python3-scipy
-    python3-sphinx
-    python3-sphinxcontrib.bibtex
+  image: sergiud/conics
 
 build:
   stage: build
   script:
-    - make SPHINXBUILD='python3 -m sphinx' -C docs/ html
+    - make -C docs/ html
 
 test:
   stage: test
   script:
-    - python3-coverage run --source=conics/
+    - coverage run --source=conics/
       -m pytest
       --junitxml pytest.xml
-    - python3-coverage report
-    - python3-coverage xml
+    - coverage report
+    - coverage xml
   needs: []
   coverage: '/TOTAL.+ ([0-9]{1,3}%)/'
   artifacts:
