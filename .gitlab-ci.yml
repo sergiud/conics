@@ -3,6 +3,21 @@ default:
     - docker
   image: sergiud/conics
 
+.env_template: &env_definition
+  - export PYTHONWARNINGS=error
+
+.lint_template: &lint_definition
+  stage: test
+  needs: []
+  allow_failure: true
+  script:
+    - autopep8 --exit-code --diff -r .
+    - flake8 .
+    - isort --check-only --diff .
+
+lint:
+  <<: *lint_definition
+
 build:
   stage: build
   script:
@@ -11,6 +26,7 @@ build:
 test:
   stage: test
   script:
+    - *env_definition
     - coverage run --source=conics/
       -m pytest
       --junitxml pytest.xml

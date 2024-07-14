@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,9 +45,9 @@ class Parabola:
         #    self.vertex, self.p, self.alpha = args
         # elif len(*args) == 3:
         #    self.vertex, self.p, self.alpha = tuple(*args)
-        #self.vertex = args[0]
-        #self.p = args[1]
-        #self.alpha = args[2]
+        # self.vertex = args[0]
+        # self.p = args[1]
+        # self.alpha = args[2]
         # self.vertex, self.p, self.alpha = *args
 
     def contact(self, pts, **kwargs):
@@ -75,7 +75,7 @@ class Parabola:
             x, y = xy
             J = np.block([[-self.p, y], [-y, xi - x - self.p]])
             # print(J)
-            #print(J.shape, J.dtype)
+            # print(J.shape, J.dtype)
 
             return J
 

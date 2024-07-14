@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ def _phi_prime(l, s, y):
           {y}_{1}^{2}}{\left(\lambda - {\sigma}_{1}^{2}\right)^{3}}
     """
     num, den = _phi_frac(l, s, y)
-    return -2*np.sum(num**2 / den**3, axis=0)
+    return -2 * np.sum(num**2 / den**3, axis=0)
 
 
 def _phi_prime2(l, s, y):
@@ -69,7 +69,7 @@ def _phi_prime2(l, s, y):
         {y}_{1}^{2}}{\left(\lambda - {\sigma}_{1}^{2}\right)^{4}}\right)
     """
     num, den = _phi_frac(l, s, y)
-    return 6*np.sum(num**2 / den**4, axis=0)
+    return 6 * np.sum(num**2 / den**4, axis=0)
 
 
 def _secular(s, y):
@@ -78,9 +78,9 @@ def _secular(s, y):
 
     assert s2 <= s1
 
-    a = s2*y2
-    b = np.abs(s1*y1)
-    diff = s2**2-s1**2
+    a = s2 * y2
+    b = np.abs(s1 * y1)
+    diff = s2**2 - s1**2
 
     if np.isclose(a, 0):
         if b <= diff:
@@ -92,16 +92,16 @@ def _secular(s, y):
             l = s2**2 - np.abs(a)
         else:
             l1 = s2**2 - np.sqrt(2) * np.max([b, np.abs(a)])
-            #l2 = s2*(s2-np.abs(y2))
-            l2 = s2**2-np.abs(s2*y2)
+            # l2 = s2*(s2-np.abs(y2))
+            l2 = s2**2 - np.abs(s2 * y2)
 
             res = scipy.optimize.root_scalar(_phi, args=(s, y), method='halley', bracket=(l1, l2),
                                              x0=l2, x1=l2, fprime=_phi_prime, fprime2=_phi_prime2)
             l = res.root
 
     assert l < s2**2
-    #print('a b diff', a, b, diff)
-    #l = -0.102179e-5
+    # print('a b diff', a, b, diff)
+    # l = -0.102179e-5
     np.testing.assert_almost_equal(_phi(l, s, y), 0)
 
     return l
@@ -164,9 +164,9 @@ def fit_nievergelt(pts, type='parabola', scale=False):
     xy = np.prod(centered, axis=0).T
 
     M23 = centered.T
-    M = np.column_stack((np.ones_like(x), M23, y2-x2, 2*xy, x2+y2))
+    M = np.column_stack((np.ones_like(x), M23, y2 - x2, 2 * xy, x2 + y2))
 
-    M1 = M[:, 0]
+    # M1 = M[:, 0]
 
     s = np.linalg.svd(M23, full_matrices=False, compute_uv=False)
     # Singular values are sorted in descending order
@@ -214,7 +214,7 @@ def fit_nievergelt(pts, type='parabola', scale=False):
         Z /= sqrt2
 
         c2b = solve_triangular(R11, -R12 @ q)
-        w = np.reciprocal(sqrt2)*Z@q
+        w = np.reciprocal(sqrt2) * Z @ q
 
         a11, a12, a22 = w.ravel()
         a12 /= sqrt2

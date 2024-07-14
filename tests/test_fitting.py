@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -99,19 +99,6 @@ def test_nievergelt_down_parabola_shifted1():
     np.testing.assert_approx_equal(alpha, -np.pi / 2)
 
 
-def test_nievergelt_down_parabola_shifted1():
-    x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = -x**2 + 10 * x + 5
-
-    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
-
-    vertex, p, alpha = C.to_parabola()
-
-    np.testing.assert_array_almost_equal(vertex, [5, 30])
-    np.testing.assert_approx_equal(p, 0.5)
-    np.testing.assert_approx_equal(alpha, -np.pi / 2)
-
-
 def test_nievergelt_spaeth_parabola1():
     x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
     y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
@@ -150,6 +137,7 @@ def test_harker_up_parabola():
     np.testing.assert_approx_equal(p, 0.5)
     np.testing.assert_approx_equal(alpha, np.pi / 2)
 
+
 def test_harker_up_parabola_shifted():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = +x**2 + 5
@@ -161,6 +149,7 @@ def test_harker_up_parabola_shifted():
     np.testing.assert_array_almost_equal(vertex, [0, 5])
     np.testing.assert_approx_equal(p, 0.5)
     np.testing.assert_approx_equal(alpha, np.pi / 2)
+
 
 def test_harker_spaeth_parabola1():
     x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
@@ -186,6 +175,7 @@ def test_harker_spaeth_parabola2():
     np.testing.assert_array_almost_equal(vertex, [0.660814, 3.225972])
     np.testing.assert_approx_equal(p, 0.52728966)
     np.testing.assert_approx_equal(alpha, np.deg2rad(124.234452))
+
 
 def test_harker_perfect_circle():
     t = np.linspace(-np.pi, np.pi)

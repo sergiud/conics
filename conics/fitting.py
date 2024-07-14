@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 # limitations under the License.
 
 from ._conic import Conic
-from ._harker import fit_harker
+from ._harker import fit_harker  # noqa: F401
 from ._nievergelt import fit_nievergelt
 from .geometry import hnormalized
 from .geometry import line_intersection
@@ -38,7 +38,7 @@ def fit_dlt(pts):
     """
     x, y = pts
 
-    A = np.column_stack((x**2, x*y, y**2, x, y, np.ones_like(x)))
+    A = np.column_stack((x**2, x * y, y**2, x, y, np.ones_like(x)))
 
     u, s, vt = np.linalg.svd(A)
 
@@ -108,39 +108,38 @@ if __name__ == '__main__':
     from . import Parabola
     import matplotlib.patches as mpatches
     import matplotlib.pyplot as plt
-    import numpy as np
 
     x = [-7, -3, 0, 0, 1, 1]
     y = [9, 5, 4, 8, 3, 5]
 
-    #x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
-    #y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
+    # x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
+    # y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
 
     y = [-2, -0.1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
     x = [1, 0.5, 0.1, 0, 0, 0, 0.2, 0.3, 0.4, 0.5, 0.6]
 
-    #x = [-1, 2, 5, 10, -4]
-    #y = [1, -2, 3, -4, -3]
+    # x = [-1, 2, 5, 10, -4]
+    # y = [1, -2, 3, -4, -3]
 
     x = [-1.1, 0, 0, 0, -0.5]
     y = [0, 1, 2, 3, 4]
 
-    #x = np.array([-4, -2, -1, 0, 1, 2, 4])
+    # x = np.array([-4, -2, -1, 0, 1, 2, 4])
     # y = 2*x**2+1*x+5  # +0.25*x**2+0
-    #y = np.array([-4, -2, -1, 0, 1, 2, 4])
+    # y = np.array([-4, -2, -1, 0, 1, 2, 4])
     # x = -2 * y**2 - 0.5  # +0.25*x**2+0
-    #x = [1, 0, 3, 4, 5]
-    #y = [3, -1, 10, 50, 100]
+    # x = [1, 0, 3, 4, 5]
+    # y = [3, -1, 10, 50, 100]
 
-    #x = [-34.75, -22, -15.5, -8.0, -4, -1.0, 1.5, 4.5, 9.25, 17, 23.5, 36, 64.5]
-    #y = [20.25, 17, 15.0, 13.5, 13, 12.5, 12.5, 13.0, 14.00, 16, 18.0, 21, 29.5]
+    # x = [-34.75, -22, -15.5, -8.0, -4, -1.0, 1.5, 4.5, 9.25, 17, 23.5, 36, 64.5]
+    # y = [20.25, 17, 15.0, 13.5, 13, 12.5, 12.5, 13.0, 14.00, 16, 18.0, 21, 29.5]
 
     pts = np.vstack((x, y)).astype(np.float)
-    #pts[1] *= 1e-2
-    #C = fit_nievergelt(pts, type='hyperbola')
+    # pts[1] *= 1e-2
+    # C = fit_nievergelt(pts, type='hyperbola')
     C = fit_nievergelt(pts, type='parabola', scale=True)
 
-    C = C.constrain(pts, fix_angle=np.pi/4)
+    C = C.constrain(pts, fix_angle=np.pi / 4)
 
     vertex, p, alpha = C.to_parabola()
     pb = Parabola(vertex, p, alpha)
@@ -152,13 +151,13 @@ if __name__ == '__main__':
     # plt.figure()
     # plt.axis('equal')
 
-    #R = rot2d(alpha)
-    #x = np.linspace(-10, 10)
-    #y2 = 2*p*x
-    #y = np.sqrt(y2)
+    # R = rot2d(alpha)
+    # x = np.linspace(-10, 10)
+    # y2 = 2*p*x
+    # y = np.sqrt(y2)
 
-    #x, y = R @ np.vstack((x, y)) + vertex[..., np.newaxis]
-    #plt.plot(x, y)
+    # x, y = R @ np.vstack((x, y)) + vertex[..., np.newaxis]
+    # plt.plot(x, y)
 
     # plt.show()
 
@@ -186,7 +185,7 @@ if __name__ == '__main__':
     plt.plot(pp2[0], pp2[1])
 
     path = mpatches.Path(np.vstack((s1.T, inter, s2.T)), [mpatches.Path.MOVETO,
-                                                             mpatches.Path.CURVE3, mpatches.Path.CURVE3])
+                                                          mpatches.Path.CURVE3, mpatches.Path.CURVE3])
     pp = mpatches.PathPatch(
         path,
         linestyle='--',

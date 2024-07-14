@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2019 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from conics.geometry import line_intersection
-from conics.geometry import line_through
 from conics.geometry import hnormalized
 from conics.geometry import homogeneous
+from conics.geometry import line_intersection
+from conics.geometry import line_through
 import numpy as np
 
 

@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import matplotlib.pyplot as plt
-from conics.fitting import fit_nievergelt
-import numpy as np
 from conics import Parabola
+from conics.fitting import fit_nievergelt
+import matplotlib.pyplot as plt
+import numpy as np
 
-#x = [-7, -3, 0, 0, 1, 1]
-#y = [9, 5, 4, 8, 3, 5]
+# x = [-7, -3, 0, 0, 1, 1]
+# y = [9, 5, 4, 8, 3, 5]
 x = [-1, 2, 5, 10, -4]
 y = [1, -2, 3, -4, -3]
 

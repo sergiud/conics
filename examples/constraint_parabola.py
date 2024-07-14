@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import matplotlib.pyplot as plt
-import numpy as np
-from conics import Conic
 from conics.fitting import fit_dlt
 from conics.fitting import fit_nievergelt
+import matplotlib.pyplot as plt
+import numpy as np
 
 x = [-1, -0.5, 0, 0.5, 1, 0.5, 0, -0.5]
 y = [0, +0.5, 1, 0.5, 1, -0.5, -1, -0.5]
@@ -44,4 +43,3 @@ plt.contour(X, Y, Z2.reshape(X.shape), levels=0)
 plt.contour(X, Y, Z3.reshape(X.shape), levels=0)
 plt.scatter(*pts)
 plt.show()
-

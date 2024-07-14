@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2022 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -83,11 +83,11 @@ def a2g(x0, C33, f):
     evals, evecs = np.linalg.eigh(C33)
     # TODO sqrt argument may be negative
     val = factor * np.reciprocal(evals)
-    #print(val, evals)
+    # print(val, evals)
     major_minor = np.sqrt(val)
 
     # TODO viz generates division by zero warning
-    #alpha = np.arctan(np.divide(*evecs[::-1, 0]))
+    # alpha = np.arctan(np.divide(*evecs[::-1, 0]))
     alpha = np.arctan2(*evecs[::-1, 0]) % np.pi
 
     return x0, major_minor, alpha
@@ -205,21 +205,21 @@ def estimate_pose(Q, r, alpha):
     # 2^3 possibilities to arrange [+1,-1] in three positions
     s1, s2, s3 = np.array(
         list(itertools.product(*itertools.repeat([+1, -1], 3)))).T
-    alpha = alpha*np.ones_like(s1)
+    alpha = alpha * np.ones_like(s1)
 
     den = np.sqrt(-lambda1 * lambda3)
     z0 = s3 * lambda2 * r / den
 
-    right = np.array([[s2*h], [np.zeros_like(s1)], [-s1*g]])
+    right = np.array([[s2 * h], [np.zeros_like(s1)], [-s1 * g]])
 
     # Batch multiplication + move num axis from the end to the front
     # Basically,
-    #n = np.einsum('ij,jlk->kil', evecs, right)
+    # n = np.einsum('ij,jlk->kil', evecs, right)
     n = evecs @ np.moveaxis(right, -1, 0)
 
     # Expand z0 dimensions to enable correct broadcasting for the multiplication with a scalar.
     left = np.array(
-        [[lambda3/lambda2], [0], [lambda1/lambda2]])[..., np.newaxis]
+        [[lambda3 / lambda2], [0], [lambda1 / lambda2]])[..., np.newaxis]
 
     c = z0[..., np.newaxis, np.newaxis] * \
         evecs @ np.moveaxis(left * right, -1, 0)
@@ -227,9 +227,9 @@ def estimate_pose(Q, r, alpha):
     cos_a = np.cos(alpha)
     sin_a = np.sin(alpha)
 
-    R = evecs @ np.moveaxis(np.array([[g*cos_a, s1*g*sin_a, s2*h],
-                                      [sin_a, -s1*cos_a, np.zeros_like(s1)],
-                                      [s1*s2*h*cos_a, s2*h*sin_a, -s1*g]]), -1, 0)
+    R = evecs @ np.moveaxis(np.array([[g * cos_a, s1 * g * sin_a, s2 * h],
+                                      [sin_a, -s1 * cos_a, np.zeros_like(s1)],
+                                      [s1 * s2 * h * cos_a, s2 * h * sin_a, -s1 * g]]), -1, 0)
 
     factor = np.sqrt((lambda1 - lambda2) * (lambda2 - lambda3)) / lambda2
     t = np.array([[-s2 * factor * cos_a],
@@ -607,16 +607,6 @@ class Conic:
         k = np.cbrt(d / np.linalg.det(C))
         return Conic.from_homogeneous(k * C)
 
-    def normalize(self, d=-1):
-        # We want to obtain a specific determinant value. Given the property of
-        # a determinant where det(kC) = k^n*det(C), (n is the size of the
-        # matrix), we want to determine k that yield the desired determinant.
-        # k^n*det(C)=d iff k^n=d/det(C). Since n=3, it follows
-        # k=cbrt(d/det(C))
-        C = self.homogeneous
-        k = np.cbrt(d / np.linalg.det(C))
-        return Conic.from_homogeneous(k * C)
-
     def __repr__(self):
         return repr(self.coeffs_)
 
@@ -633,7 +623,7 @@ class Conic:
 
         if s[0] == 2:
             x, y = pts
-            A = np.column_stack((x**2, x*y, y**2, x, y, np.ones_like(x)))
+            A = np.column_stack((x**2, x * y, y**2, x, y, np.ones_like(x)))
             return A @ self.coeffs_
 
         return np.diagonal(pts.T @ self.homogeneous @ pts)
@@ -734,8 +724,8 @@ class Conic:
         a, b, c, d, e, f = self.coeffs_
         x, y = pts
 
-        dx = 2*a*x+b*y+d
-        dy = b*x+2*c*y+e
+        dx = 2 * a * x + b * y + d
+        dy = b * x + 2 * c * y + e
 
         return np.vstack((dx, dy))
 
@@ -787,15 +777,15 @@ class Conic:
             A, B, C, D, E, F = a  # / Conic.__factors()
 
             f = np.column_stack(
-                (x**2, 2*x*y, y**2, 2*x, 2*y, np.ones_like(x))) * a[np.newaxis, ...]
+                (x**2, 2 * x * y, y**2, 2 * x, 2 * y, np.ones_like(x))) * a[np.newaxis, ...]
             f7 = np.sum(f, axis=1)
 
-            residuals = np.stack((*f7, w8*(B**2-A*C), w9*(A + C - 1)))
+            residuals = np.stack((*f7, w8 * (B**2 - A * C), w9 * (A + C - 1)))
 
             if fix_angle:
                 t = np.hypot(A, B)
                 residuals = np.stack(
-                    (*residuals, w10*(A - c1*t), w10*(B+c2*t)))
+                    (*residuals, w10 * (A - c1 * t), w10 * (B + c2 * t)))
 
             return residuals
 
@@ -804,9 +794,9 @@ class Conic:
             A, B, C, D, E, F = a  # / Conic.__factors()
 
             top = np.column_stack(
-                (x**2, 2*x*y, y**2, 2*x, 2*y, np.ones_like(x)))
+                (x**2, 2 * x * y, y**2, 2 * x, 2 * y, np.ones_like(x)))
             bl = np.array([
-                [-w8*C, 2*w8*B, -w8*A],
+                [-w8 * C, 2 * w8 * B, -w8 * A],
                 [w9, 0, w9]])
             br = np.zeros_like(bl)
 
@@ -815,8 +805,8 @@ class Conic:
 
             if fix_angle:
                 bl = np.array([
-                    [w10*c2**2, w10*c1*c2, 0],
-                    [w10*c1*c2, w10*c1**2, 0]])
+                    [w10 * c2**2, w10 * c1 * c2, 0],
+                    [w10 * c1 * c2, w10 * c1**2, 0]])
                 br = np.zeros_like(bl)
 
                 J = np.block([[J],
@@ -836,14 +826,14 @@ if False:
     A1 = _make_circle([5, 5], 20)
     A2 = _make_circle([5.01, 5], 10)
 
-    #icp(A1, A2)
+    # icp(A1, A2)
     print(concentric_conics_vanishing_line(A2, A1))
 
 if False:
     A1 = _make_circle([5, 5], 20)
     A2 = _make_circle([5.01, 5], 10)
 
-    #icp(A1, A2)
+    # icp(A1, A2)
     print(concentric_conics_vanishing_line(A2, A1))
 
 if False:

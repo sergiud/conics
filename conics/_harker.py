@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import numpy as np
 from ._conic import Conic
-from .geometry import rot2d
+import numpy as np
 
 
 def _build_scatter_matrices(pts):
@@ -175,7 +174,7 @@ def _correct_bias(pts, S11, S21, S22, z_e, z_h, x2m, xym, y2m, k_e, k_h):
     else:
         mu = 0  # No minimum
 
-    mu12_2 = np.roots([k_e + k_h, -2*k_e, k_e])
+    # mu12_2 = np.roots([k_e + k_h, -2 * k_e, k_e])
 
     # Backsubstitute mu into the conic pencil.
     z_mu = (1 - mu) * z_e + mu * z_h
@@ -252,13 +251,13 @@ if __name__ == '__main__':
     x = np.cos(t) + np.random.normal(scale=0.05, size=t.size)
     y = np.sin(t) + np.random.normal(scale=0.05, size=t.size)
 
-    #y = np.linspace(-5, 4, num=250)
-    #x = -y**2 + 2 * y - 5 + np.random.normal(scale=0.25, size=y.size)
+    # y = np.linspace(-5, 4, num=250)
+    # x = -y**2 + 2 * y - 5 + np.random.normal(scale=0.25, size=y.size)
 
-    #x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
-    #y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
+    # x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
+    # y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
 
-    #pts = rot2d(np.pi / 4 * 0) @ np.vstack((x, y))
+    # pts = rot2d(np.pi / 4 * 0) @ np.vstack((x, y))
     pts = np.vstack((x, y))
 
     C = fit_harker(pts, type='ellipse')

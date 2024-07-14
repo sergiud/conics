@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import matplotlib.pyplot as plt
 from conics.fitting import fit_nievergelt
+import matplotlib.pyplot as plt
 import numpy as np
 
 y = [-2, -0.1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -37,14 +37,14 @@ fig = plt.figure()
 
 ax1, ax2 = fig.subplots(1, 2)
 
-#ax1.set_aspect('equal', 'box')
-#ax2.set_aspect('equal', 'box')
+# ax1.set_aspect('equal', 'box')
+# ax2.set_aspect('equal', 'box')
 
 cs = ax1.contour(X, Y, Z1.reshape(X.shape), levels=0)
-#cs.collections[1].set_label('fitted parabola (unscaled)')
+# cs.collections[1].set_label('fitted parabola (unscaled)')
 
 cs_refined = ax2.contour(X, Y, Z2.reshape(X.shape), colors='red', levels=0)
-#cs_refined.collections[1].set_label('fitted parabola (scaled)')
+# cs_refined.collections[1].set_label('fitted parabola (scaled)')
 
 ax1.scatter(x, y, label='observations')
 ax2.scatter(x, y)

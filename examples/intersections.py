@@ -1,7 +1,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2019 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 from conics import Conic
 from conics.geometry import hnormalized
-import matplotlib.pyplot as plt
 from matplotlib.patches import Ellipse
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -34,7 +34,7 @@ e1 = Conic.from_ellipse([0, 0], [2, 1], np.pi / 4)
 e2 = Conic.from_ellipse([0, 0], [2, 1], np.pi * 3 / 4)
 
 c3 = Conic.from_circle([0, 0], 1)
-c4 = c3.translate([2*1, 0])
+c4 = c3.translate([2 * 1, 0])
 
 inter1 = hnormalized(c1.intersect(c2))
 inter2 = hnormalized(e1.intersect(e2))
