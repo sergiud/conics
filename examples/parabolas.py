@@ -25,13 +25,13 @@ from conics import Parabola
 x = [-1, 2, 5, 10, -4]
 y = [1, -2, 3, -4, -3]
 
-pts = np.row_stack((x, y))
+pts = np.vstack((x, y))
 
 C = fit_nievergelt(pts, type='parabola', scale=False)
 
 X, Y = np.meshgrid(np.linspace(np.min(x) - 3, np.max(x) + 1),
                    np.linspace(-1 + np.min(y), np.max(y) + 1))
-Z = C(np.row_stack((X.ravel(), Y.ravel())))
+Z = C(np.vstack((X.ravel(), Y.ravel())))
 
 p = Parabola.from_conic(C)
 
@@ -40,7 +40,7 @@ C_refined = p_refined.to_conic()
 
 contact_pts = p_refined.contact(pts)
 
-Z_refined = C_refined(np.row_stack((X.ravel(), Y.ravel())))
+Z_refined = C_refined(np.vstack((X.ravel(), Y.ravel())))
 
 plt.figure()
 plt.axis('equal')

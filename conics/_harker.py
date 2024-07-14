@@ -93,7 +93,7 @@ def _compute_parabola(M):
     s = 2 * r_by_u * (k3 * r + alpha1 * gamma4)
     t = r_by_u * (k6 * r + 2 * alpha2 * gamma5)
 
-    ust = np.row_stack((np.ones_like(s), s, t))
+    ust = np.vstack((np.ones_like(s), s, t))
 
     theta = evecs[..., ::-1] @ ust
     a, b, c = theta
@@ -258,8 +258,8 @@ if __name__ == '__main__':
     #x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
     #y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
 
-    #pts = rot2d(np.pi / 4 * 0) @ np.row_stack((x, y))
-    pts = np.row_stack((x, y))
+    #pts = rot2d(np.pi / 4 * 0) @ np.vstack((x, y))
+    pts = np.vstack((x, y))
 
     C = fit_harker(pts, type='ellipse')
 
@@ -267,7 +267,7 @@ if __name__ == '__main__':
 
     X, Y = np.meshgrid(np.linspace(np.min(pts[0]) - 1, np.max(pts[0]) + 1),
                        np.linspace(-1 + np.min(pts[1]), np.max(pts[1]) + 1))
-    Z = C(np.row_stack((X.ravel(), Y.ravel())))
+    Z = C(np.vstack((X.ravel(), Y.ravel())))
 
     plt.figure()
     plt.contour(X, Y, Z.reshape(X.shape), levels=0)

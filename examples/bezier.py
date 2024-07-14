@@ -25,7 +25,7 @@ import numpy as np
 x = [-7, -3, 0, 0, 1, 1]
 y = [9, 5, 4, 8, 3, 5]
 
-pts = np.row_stack((x, y))
+pts = np.vstack((x, y))
 
 C = fit_nievergelt(pts, type='parabola', scale=True)
 pb = Parabola.from_conic(C)
@@ -35,7 +35,7 @@ s1, inter, s2 = control_points.T
 
 X, Y = np.meshgrid(np.linspace(np.min(x) - 1, np.max(x) + 1),
                    np.linspace(-1 + np.min(y), np.max(y) + 1))
-Z = C(np.row_stack((X.ravel(), Y.ravel())))
+Z = C(np.vstack((X.ravel(), Y.ravel())))
 
 fig = plt.figure()
 

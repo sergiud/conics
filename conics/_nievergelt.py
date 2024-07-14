@@ -201,7 +201,7 @@ def fit_nievergelt(pts, type='parabola', scale=False):
 
             p = -R22 @ np.array([[0], [0], [1]])
             q12 = _geodatic(G, p)
-            q = np.row_stack((q12, [1]))
+            q = np.vstack((q12, [1]))
 
         R11 = R[:3, :3]
         R12 = R[:3, 3:]

@@ -25,7 +25,7 @@ def test_up_parabola_contact_points():
     x = np.arange(-4, 4 + 1)
     y = x**2 + 5
 
-    pts = np.row_stack((x, y))
+    pts = np.vstack((x, y))
 
     C = fit_nievergelt(pts, type='parabola', scale=True)
     p = Parabola.from_conic(C)
@@ -39,7 +39,7 @@ def test_parabola1():
     x = [-1, 2, 5, 10, -4]
     y = [1, -2, 3, -4, -3]
 
-    pts = np.row_stack((x, y))
+    pts = np.vstack((x, y))
 
     p1 = Parabola([-4.707, -1.269], 0.512, 0.088)
 

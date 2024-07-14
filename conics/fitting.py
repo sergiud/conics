@@ -135,7 +135,7 @@ if __name__ == '__main__':
     #x = [-34.75, -22, -15.5, -8.0, -4, -1.0, 1.5, 4.5, 9.25, 17, 23.5, 36, 64.5]
     #y = [20.25, 17, 15.0, 13.5, 13, 12.5, 12.5, 13.0, 14.00, 16, 18.0, 21, 29.5]
 
-    pts = np.row_stack((x, y)).astype(np.float)
+    pts = np.vstack((x, y)).astype(np.float)
     #pts[1] *= 1e-2
     #C = fit_nievergelt(pts, type='hyperbola')
     C = fit_nievergelt(pts, type='parabola', scale=True)
@@ -157,7 +157,7 @@ if __name__ == '__main__':
     #y2 = 2*p*x
     #y = np.sqrt(y2)
 
-    #x, y = R @ np.row_stack((x, y)) + vertex[..., np.newaxis]
+    #x, y = R @ np.vstack((x, y)) + vertex[..., np.newaxis]
     #plt.plot(x, y)
 
     # plt.show()
@@ -169,7 +169,7 @@ if __name__ == '__main__':
 
     X, Y = np.meshgrid(np.linspace(np.min(x) - 1, np.max(x) + 1),
                        np.linspace(-1 + np.min(y), np.max(y) + 1))
-    Z = C(np.row_stack((X.ravel(), Y.ravel())))
+    Z = C(np.vstack((X.ravel(), Y.ravel())))
 
     plt.contour(X, Y, Z.reshape(X.shape), levels=0)
     plt.scatter(x, y)
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     plt.plot(pp1[0], pp1[1])
     plt.plot(pp2[0], pp2[1])
 
-    path = mpatches.Path(np.row_stack((s1.T, inter, s2.T)), [mpatches.Path.MOVETO,
+    path = mpatches.Path(np.vstack((s1.T, inter, s2.T)), [mpatches.Path.MOVETO,
                                                              mpatches.Path.CURVE3, mpatches.Path.CURVE3])
     pp = mpatches.PathPatch(
         path,

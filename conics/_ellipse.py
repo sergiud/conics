@@ -69,8 +69,8 @@ class Ellipse:
         mask = np.abs(xi) < a
         tmp = np.sqrt(a**2 - xi**2, out=np.zeros_like(xi), where=mask)
 
-        xk21 = np.row_stack((xi, np.copysign(b / a * tmp, yi)))
-        xk22 = np.row_stack(
+        xk21 = np.vstack((xi, np.copysign(b / a * tmp, yi)))
+        xk22 = np.vstack(
             (np.copysign(
                 a * np.ones_like(xi),
                 xi),

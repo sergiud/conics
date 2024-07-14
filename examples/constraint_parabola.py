@@ -25,7 +25,7 @@ x = [-1, -0.5, 0, 0.5, 1, 0.5, 0, -0.5]
 y = [0, +0.5, 1, 0.5, 1, -0.5, -1, -0.5]
 
 
-pts = np.row_stack((x, y))
+pts = np.vstack((x, y))
 C1 = fit_dlt(pts)
 
 C2 = C1.constrain(pts)
@@ -34,9 +34,9 @@ C3 = fit_nievergelt(pts)
 
 X, Y = np.meshgrid(np.linspace(np.min(x) - 1, np.max(x) + 1),
                    np.linspace(-1 + np.min(y), np.max(y) + 1))
-Z1 = C1(np.row_stack((X.ravel(), Y.ravel())))
-Z2 = C2(np.row_stack((X.ravel(), Y.ravel())))
-Z3 = C3(np.row_stack((X.ravel(), Y.ravel())))
+Z1 = C1(np.vstack((X.ravel(), Y.ravel())))
+Z2 = C2(np.vstack((X.ravel(), Y.ravel())))
+Z3 = C3(np.vstack((X.ravel(), Y.ravel())))
 
 plt.figure()
 plt.contour(X, Y, Z1.reshape(X.shape), levels=0)

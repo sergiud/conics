@@ -25,7 +25,7 @@ def test_nievergelt_up_parabola():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = +x**2
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -38,7 +38,7 @@ def test_nievergelt_up_parabola_shifted():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = +x**2 + 5
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -51,7 +51,7 @@ def test_nievergelt_up_parabola_shifted1():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = +x**2 + 10 * x + 5
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -64,7 +64,7 @@ def test_nievergelt_down_parabola():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = -x**2
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -77,7 +77,7 @@ def test_nievergelt_down_parabola_shifted():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = -x**2 + 5
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -90,7 +90,7 @@ def test_nievergelt_down_parabola_shifted1():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = -x**2 + 10 * x + 5
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -103,7 +103,7 @@ def test_nievergelt_down_parabola_shifted1():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = -x**2 + 10 * x + 5
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -116,7 +116,7 @@ def test_nievergelt_spaeth_parabola1():
     x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
     y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -129,7 +129,7 @@ def test_nievergelt_spaeth_parabola2():
     x = [-7, -3, 0, 0, 1, 1]
     y = [9, 5, 4, 8, 3, 5]
 
-    C = fit_nievergelt(np.row_stack((x, y)), type='parabola')
+    C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -142,7 +142,7 @@ def test_harker_up_parabola():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = +x**2
 
-    C = fit_harker(np.row_stack((x, y)), type='parabola')
+    C = fit_harker(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -154,7 +154,7 @@ def test_harker_up_parabola_shifted():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
     y = +x**2 + 5
 
-    C = fit_harker(np.row_stack((x, y)), type='parabola')
+    C = fit_harker(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -166,7 +166,7 @@ def test_harker_spaeth_parabola1():
     x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
     y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
 
-    C = fit_harker(np.row_stack((x, y)), type='parabola')
+    C = fit_harker(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -179,7 +179,7 @@ def test_harker_spaeth_parabola2():
     x = [-7, -3, 0, 0, 1, 1]
     y = [9, 5, 4, 8, 3, 5]
 
-    C = fit_harker(np.row_stack((x, y)), type='parabola')
+    C = fit_harker(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
@@ -192,7 +192,7 @@ def test_harker_perfect_circle():
     x = np.cos(t) + 1
     y = np.sin(t) + 2
 
-    C = fit_harker(np.row_stack((x, y)), type='ellipse')
+    C = fit_harker(np.vstack((x, y)), type='ellipse')
 
     e = Ellipse.from_conic(C)
 

@@ -22,15 +22,15 @@ import numpy as np
 y = [-2, -0.1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 x = [1, 0.5, 0.1, 0, 0, 0, 0.2, 0.3, 0.4, 0.5, 0.6]
 
-pts = np.row_stack((x, y))
+pts = np.vstack((x, y))
 
 C1 = fit_nievergelt(pts, type='parabola', scale=False)
 C2 = fit_nievergelt(pts, type='parabola', scale=True)
 
 X, Y = np.meshgrid(np.linspace(np.min(x) - 1, np.max(x) + 1),
                    np.linspace(-1 + np.min(y), np.max(y) + 1))
-Z1 = C1(np.row_stack((X.ravel(), Y.ravel())))
-Z2 = C2(np.row_stack((X.ravel(), Y.ravel())))
+Z1 = C1(np.vstack((X.ravel(), Y.ravel())))
+Z2 = C2(np.vstack((X.ravel(), Y.ravel())))
 
 fig = plt.figure()
 # fig.set_aspect('equal')

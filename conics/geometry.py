@@ -24,7 +24,7 @@ def hnormalized(p):
 
 def homogeneous(p):
     p = np.atleast_2d(p).T
-    return np.row_stack((p, np.ones_like(p[0])))
+    return np.vstack((p, np.ones_like(p[0])))
 
 
 def line_through(a, b):

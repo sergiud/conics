@@ -74,7 +74,7 @@ def g2a(x0, major_minor, alpha):
     d, e = -2 * M @ x0
     f = x0.T @ M @ x0 - 1
 
-    return np.row_stack((a, b, c, d, e, f))
+    return np.vstack((a, b, c, d, e, f))
 
 
 def a2g(x0, C33, f):
@@ -263,7 +263,7 @@ class Conic:
 
     def __center(self, C33):
         d, e = self.coeffs_[-3:-1]
-        return -np.linalg.solve(C33, np.row_stack((d, e)) / 2)
+        return -np.linalg.solve(C33, np.vstack((d, e)) / 2)
 
     @property
     def center(self):
@@ -366,7 +366,7 @@ class Conic:
         bb2 = -BB[i, i]
 
         if bb2 < 0:
-            bb2 = np.complex_(bb2)
+            bb2 = np.complex128(bb2)
 
         bb = np.sqrt(bb2)
 
@@ -405,7 +405,7 @@ class Conic:
         D = -np.linalg.det(B[:2, :2])
 
         if D < 0:
-            D = np.complex_(D)
+            D = np.complex128(D)
 
         aa = 1 / t * np.sqrt(D)
         C = B + aa * M_l
@@ -731,7 +731,7 @@ class Conic:
         dx = 2*a*x+b*y+d
         dy = b*x+2*c*y+e
 
-        return np.row_stack((dx, dy))
+        return np.vstack((dx, dy))
 
     def constrain(self, pts, type='parabola', fix_angle=False):
         R"""Conditions the conic to a specific type and specific properties.
