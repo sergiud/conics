@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: If you use conics in your work, please reference it as below.
+title: conics
+abstract: Library for managing conic sections
+authors:
+- family-names: Deitsch
+  given-names: Sergiu
+  orcid: https://orcid.org/0000-0001-8865-8066
+version: 0.1.0
+date-released: 2019-05-21
+license: Apache-2.0
+repository-code: https://github.com/sergiud/conics

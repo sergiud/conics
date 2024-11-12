@@ -1,19 +1,26 @@
-Welcome to Conics's documentation!
-======================================
+conics
+======
+
+Conics is a library for dealing with conic sections (or simply `conics`).
+
+Features
+--------
+
+* Conics construction and transformation
+* Algebraic and geometric fitting and conditioning
+* Computing intersections of conics
+* 5-D pose estimation of the supporting plane of an ellipse
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 4
+   :hidden:
 
    readme
-   installation
    usage
-   contributing
-   authors
-   history
+   bibliography
+   license
 
 Indices and tables
 ==================
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

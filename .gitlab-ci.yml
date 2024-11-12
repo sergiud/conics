@@ -8,28 +8,28 @@ default:
 
 .lint_template: &lint_definition
   stage: test
-  needs: []
   allow_failure: true
   script:
     - autopep8 --exit-code --diff -r .
     - flake8 .
     - isort --check-only --diff .
 
-lint:
+lint:python3.12:
   <<: *lint_definition
+  needs: []
 
-build:
+docs:python3.12:
   stage: build
   script:
-    - make -C docs/ html
+    - sphinx-build -M html docs/ docs/_build -W --keep-going
+  needs: []
 
-test:
+test:python3.12:
   stage: test
   script:
     - *env_definition
-    - coverage run --source=conics/
-      -m pytest
-      --junitxml pytest.xml
+    - coverage run -m pytest --junitxml pytest.xml
+    - coverage combine
     - coverage report
     - coverage xml
   needs: []

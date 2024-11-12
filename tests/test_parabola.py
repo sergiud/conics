@@ -1,4 +1,4 @@
-
+#
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -14,6 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
 from conics import Conic
 from conics import Parabola

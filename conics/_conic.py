@@ -733,7 +733,7 @@ class Conic:
         R"""Conditions the conic to a specific type and specific properties.
 
         :param pts: :math:`n` 2-D coordinates given by a :math:`2\times n` matrix
-            where each coordinate is store in a column. The conditioning is
+            where each coordinate is stored in a column. The conditioning is
             performed with respect to the specified coordinates.
         :type pts: numpy.ndarray
 

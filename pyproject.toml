@@ -1,0 +1,83 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "conics"
+dynamic = ["version"]
+description = 'Conic sections library'
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+keywords = ['parabola', 'hyperbola', 'ellipse', 'circle']
+authors = [
+  { name = "Sergiu Deitsch", email = "sergiu.deitsch@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    'numpy>=1.25',
+    'scipy>=1.13.1',
+]
+
+[project.urls]
+Documentation = "https://conics.readthedocs.io"
+Issues = "https://github.com/sergiud/conics/issues"
+Source = "https://github.com/sergiud/conics"
+
+[tool.hatch.version]
+path = "conics/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/conics tests}"
+
+[tool.coverage.run]
+source_pkgs = ["conics"]
+branch = true
+parallel = true
+omit = [
+  "conics/__about__.py",
+]
+
+[tool.coverage.paths]
+conics = ["conics"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.isort]
+force_single_line = true
+from_first = true
+no_sections = true
+order_by_type = false
+
+[tool.pytest.ini_options]
+junit_family = 'xunit2'
+testpaths = ['tests']
+xfail_strict = true
+addopts = [
+    '--import-mode=importlib',
+]

@@ -15,16 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Top-level package for Conics."""
+__author__ = 'Sergiu Deitsch'
 
-__author__ = """Sergiu Deitsch"""
-__email__ = 'sergiu.deitsch@gmail.com'
-__version__ = '0.1.0'
+from ._conic import concentric_conics_vanishing_line
+from ._conic import Conic
+from ._conic import estimate_pose
+from ._conic import projected_center
+from ._conic import surface_normal
+from ._ellipse import Ellipse
+from ._parabola import Parabola
 
-from ._conic import concentric_conics_vanishing_line  # noqa: F401
-from ._conic import Conic  # noqa: F401
-from ._conic import estimate_pose  # noqa: F401
-from ._conic import projected_center  # noqa: F401
-from ._conic import surface_normal  # noqa: F401
-from ._ellipse import Ellipse  # noqa: F401
-from ._parabola import Parabola  # noqa: F401
+__all__ = ('concentric_conics_vanishing_line',
+           'Conic',
+           'estimate_pose',
+           'projected_center',
+           'surface_normal',
+           'Ellipse',
+           'Parabola',
+           )

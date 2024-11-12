@@ -17,7 +17,7 @@
 
 from ._conic import Conic
 from ._harker import fit_harker  # noqa: F401
-from ._nievergelt import fit_nievergelt
+from ._nievergelt import fit_nievergelt  # noqa: F401
 from .geometry import hnormalized
 from .geometry import line_intersection
 from .geometry import line_through
@@ -102,103 +102,3 @@ def parabola_to_bezier(parabola, start, end):
     inter = hnormalized(inter)
 
     return np.column_stack((s1, inter, s2))
-
-
-if __name__ == '__main__':
-    from . import Parabola
-    import matplotlib.patches as mpatches
-    import matplotlib.pyplot as plt
-
-    x = [-7, -3, 0, 0, 1, 1]
-    y = [9, 5, 4, 8, 3, 5]
-
-    # x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
-    # y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
-
-    y = [-2, -0.1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
-    x = [1, 0.5, 0.1, 0, 0, 0, 0.2, 0.3, 0.4, 0.5, 0.6]
-
-    # x = [-1, 2, 5, 10, -4]
-    # y = [1, -2, 3, -4, -3]
-
-    x = [-1.1, 0, 0, 0, -0.5]
-    y = [0, 1, 2, 3, 4]
-
-    # x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    # y = 2*x**2+1*x+5  # +0.25*x**2+0
-    # y = np.array([-4, -2, -1, 0, 1, 2, 4])
-    # x = -2 * y**2 - 0.5  # +0.25*x**2+0
-    # x = [1, 0, 3, 4, 5]
-    # y = [3, -1, 10, 50, 100]
-
-    # x = [-34.75, -22, -15.5, -8.0, -4, -1.0, 1.5, 4.5, 9.25, 17, 23.5, 36, 64.5]
-    # y = [20.25, 17, 15.0, 13.5, 13, 12.5, 12.5, 13.0, 14.00, 16, 18.0, 21, 29.5]
-
-    pts = np.vstack((x, y)).astype(np.float)
-    # pts[1] *= 1e-2
-    # C = fit_nievergelt(pts, type='hyperbola')
-    C = fit_nievergelt(pts, type='parabola', scale=True)
-
-    C = C.constrain(pts, fix_angle=np.pi / 4)
-
-    vertex, p, alpha = C.to_parabola()
-    pb = Parabola(vertex, p, alpha)
-    pb1 = pb.refine(pts)
-
-    C = pb1.to_conic()
-    vertex, p, alpha = C.to_parabola()
-
-    # plt.figure()
-    # plt.axis('equal')
-
-    # R = rot2d(alpha)
-    # x = np.linspace(-10, 10)
-    # y2 = 2*p*x
-    # y = np.sqrt(y2)
-
-    # x, y = R @ np.vstack((x, y)) + vertex[..., np.newaxis]
-    # plt.plot(x, y)
-
-    # plt.show()
-
-    plt.figure()
-    plt.axis('equal')
-
-    x, y = pts
-
-    X, Y = np.meshgrid(np.linspace(np.min(x) - 1, np.max(x) + 1),
-                       np.linspace(-1 + np.min(y), np.max(y) + 1))
-    Z = C(np.vstack((X.ravel(), Y.ravel())))
-
-    plt.contour(X, Y, Z.reshape(X.shape), levels=0)
-    plt.scatter(x, y)
-    plt.scatter(*vertex)
-
-    pb = Parabola(vertex, p, alpha)
-
-    s1, inter, s2 = parabola_to_bezier(pb, *pts[:, [0, -1]].T).T
-
-    pp1 = np.column_stack((s1, inter))
-    pp2 = np.column_stack((s2, inter))
-
-    plt.plot(pp1[0], pp1[1])
-    plt.plot(pp2[0], pp2[1])
-
-    path = mpatches.Path(np.vstack((s1.T, inter, s2.T)), [mpatches.Path.MOVETO,
-                                                          mpatches.Path.CURVE3, mpatches.Path.CURVE3])
-    pp = mpatches.PathPatch(
-        path,
-        linestyle='--',
-        edgecolor='blue',
-        facecolor='none',
-        lw=3)
-
-    plt.gca().add_artist(pp)
-
-    plt.scatter(*inter)
-    plt.scatter(*np.column_stack((s1, s2)))
-
-    print(C(s1))
-    print(C(s2))
-
-    plt.show()
