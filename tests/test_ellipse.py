@@ -43,6 +43,11 @@ def test_ellipse_fitting():
     sse2 = np.inner(values2, values2)
 
     assert sse2 <= sse1
+
+    C1 = e.to_conic()
+    C2 = Ellipse.from_conic(C1).to_conic()
+
+    np.testing.assert_array_equal(C1.coeffs_, C2.coeffs_)
     # print(e.center, e.major_minor, e.alpha)
 
     e1 = e.refine(pts)

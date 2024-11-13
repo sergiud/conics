@@ -24,7 +24,6 @@ from scipy.optimize import least_squares
 import itertools
 import numpy as np
 import numpy.typing as npt
-import scipy.linalg
 import warnings
 
 
@@ -32,20 +31,6 @@ def _make_circle(x0: npt.ArrayLike, r: float) -> np.ndarray:
     x0 = np.reshape(x0, (2, 1))
     C = np.block([[np.eye(2), -x0], [-x0.T, x0.T @ x0 - r**2]])
     return C
-
-
-def icp(A1: np.ndarray, A2: np.ndarray) -> tuple[float, float]:
-    e = scipy.linalg.eig(A1, A2, left=False, right=False)
-    k = np.argmax(np.abs(np.median(e) - e))
-    u, s, vt = np.linalg.svd(e[k] * np.linalg.inv(A1) - np.linalg.inv(A2))
-
-    u = u[..., :2]
-    s = s[:2]
-
-    values1 = u @ (np.sqrt(s) * np.array([1, +1j]))
-    values2 = u @ (np.sqrt(s) * np.array([1, -1j]))
-
-    return values1, values2
 
 
 # The Common Self-polar Triangle of Concentric Circles and Its Application to
@@ -979,33 +964,6 @@ class Conic:
             return J
 
         r = least_squares(fun, x0, args=(pts,), jac=jac)
-
         coeffs = r.x * Conic.__factors()
 
         return Conic(coeffs)
-
-
-if False:
-    A1 = _make_circle([5, 5], 20)
-    A2 = _make_circle([5.01, 5], 10)
-
-    # icp(A1, A2)
-
-if False:
-    A1 = _make_circle([5, 5], 20)
-    A2 = _make_circle([5.01, 5], 10)
-
-    # icp(A1, A2)
-
-if False:
-    c = Conic(1, 2, 3, 4, 5, 6.0)
-
-    C1 = np.array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0])
-    C2 = np.array([0.0, 0.0, -1.0, -1.0, 0.0, 1.0])
-
-    intersections = Conic(C1).intersect(Conic(C2))
-
-    C1 = np.array([1, 0, 0, 0, -1, 0], dtype=np.float32)
-    C2 = np.array([1, 0, 0, -2, -1, 1], dtype=np.float32)
-
-    intersections = Conic(C1).intersect(Conic(C2))

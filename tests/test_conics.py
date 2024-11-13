@@ -25,6 +25,7 @@ from conics import projected_center
 from conics import surface_normal
 from conics._conic import _make_circle
 from conics._conic import concentric_conics_vanishing_line
+from conics._conic import g2a
 from conics.geometry import hnormalized
 import numpy as np
 import pytest
@@ -58,6 +59,14 @@ def Rz(theta):
             [0, 0, 1],
         ]
     )
+
+
+@pytest.mark.parametrize('invert', [True, False])
+def test_transform_identity(invert):
+    c1 = Conic.from_circle([1, 2], 3)
+    c2 = c1.transform(np.identity(3), invert=invert)
+
+    np.testing.assert_array_equal(c1.coeffs_, c2.coeffs_)
 
 
 def test_foo():
@@ -428,3 +437,32 @@ def test_circle_infinite_line_intersection():
     assert inter.shape == (3, 0)
 
     np.testing.assert_array_almost_equal(c(inter), 0)
+
+
+def test_major_minor_warning():
+    with pytest.warns(UserWarning, match='must be larger'):
+        g2a([1, 2], [1, 2], 0)
+
+
+def test_circle_gradient():
+    center = [1, 2]
+    c = Conic.from_circle(center, 3)
+
+    np.testing.assert_array_equal(c.gradient(center), 0)
+
+
+@pytest.mark.parametrize('fix_angle', [True, False])
+def test_constrain_parabola(fix_angle):
+    center = [1, 2]
+    c = Conic.from_circle(center, 3)
+
+    x = np.array([-4, -2, -1, 0, 1, 2, 4])
+    y = +(x**2)
+
+    pts = np.vstack((x, y))
+
+    with pytest.raises(ValueError, match='is not supported yet'):
+        c.constrain(pts, type='circle')
+
+    cc = c.constrain(pts, fix_angle=fix_angle)
+    np.testing.assert_array_almost_equal(cc(pts), 0)
