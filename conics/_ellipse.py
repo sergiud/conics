@@ -152,7 +152,6 @@ class Ellipse:
 
         x0 = np.stack((*self.center, *self.major_minor, self.alpha))
         r = least_squares(fun, x0, args=(pts, ), jac=jac)
-        print(r)
 
         return Ellipse(r.x[:2], r.x[2:4], r.x[-1])
 

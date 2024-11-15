@@ -74,8 +74,6 @@ class Parabola:
         def jac(xy, xi, yi):
             x, y = xy
             J = np.block([[-self.p, y], [-y, xi - x - self.p]])
-            # print(J)
-            # print(J.shape, J.dtype)
 
             return J
 
@@ -99,7 +97,6 @@ class Parabola:
             r = least_squares(
                 fun, x0, args=(xi, yi), jac=jac, **kwargs)
             # TODO check convergence
-            # print(r)
 
             pts2[:, i] = r.x
 
@@ -170,7 +167,6 @@ class Parabola:
 
         r = least_squares(
             fun, x0, args=(pts, ), jac=jac, **kwargs)
-        # print(r)
 
         return Parabola(r.x[:2], r.x[2], r.x[3])
 

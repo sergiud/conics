@@ -38,13 +38,11 @@ def icp(A1, A2):
     u = u[..., :2]
     s = s[:2]
 
-    print(s.shape)
-
     values1 = u @ (np.sqrt(s) * np.array([1, +1j]))
     values2 = u @ (np.sqrt(s) * np.array([1, -1j]))
 
-    print(values1)
-    print(values2)
+    return values1, values2
+
 
 # The Common Self-polar Triangle of Concentric Circles and Its Application to
 # Camera Calibration
@@ -83,7 +81,6 @@ def a2g(x0, C33, f):
     evals, evecs = np.linalg.eigh(C33)
     # TODO sqrt argument may be negative
     val = factor * np.reciprocal(evals)
-    # print(val, evals)
     major_minor = np.sqrt(val)
 
     # TODO viz generates division by zero warning
@@ -816,7 +813,6 @@ class Conic:
             return J
 
         r = least_squares(fun, x0, args=(pts, ), jac=jac)
-        print(r)
 
         coeffs = r.x * Conic.__factors()
 
@@ -828,30 +824,22 @@ if False:
     A2 = _make_circle([5.01, 5], 10)
 
     # icp(A1, A2)
-    print(concentric_conics_vanishing_line(A2, A1))
 
 if False:
     A1 = _make_circle([5, 5], 20)
     A2 = _make_circle([5.01, 5], 10)
 
     # icp(A1, A2)
-    print(concentric_conics_vanishing_line(A2, A1))
 
 if False:
     c = Conic(1, 2, 3, 4, 5, 6.)
-
-    print(c.homogeneous)
 
     C1 = np.array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0])
     C2 = np.array([0.0, 0.0, -1.0, -1.0, 0.0, 1.0])
 
     intersections = Conic(C1).intersect(Conic(C2))
 
-    print(intersections[:2] / intersections[-1])
-
     C1 = np.array([1, 0, 0, 0, -1, 0], dtype=np.float32)
     C2 = np.array([1, 0, 0, -2, -1, 1], dtype=np.float32)
 
     intersections = Conic(C1).intersect(Conic(C2))
-
-    print(intersections[:2] / intersections[-1])

@@ -262,8 +262,6 @@ if __name__ == '__main__':
 
     C = fit_harker(pts, type='ellipse')
 
-    print(C(pts))
-
     X, Y = np.meshgrid(np.linspace(np.min(pts[0]) - 1, np.max(pts[0]) + 1),
                        np.linspace(-1 + np.min(pts[1]), np.max(pts[1]) + 1))
     Z = C(np.vstack((X.ravel(), Y.ravel())))

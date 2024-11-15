@@ -215,7 +215,8 @@ def test_circle_surface_normal():
     # Projection center
 
     c = projected_center(C, n)
-    print('C', c)
+
+    np.testing.assert_array_equal(np.ravel(x0), hnormalized(c))
 
 
 def test_pose_estimation():

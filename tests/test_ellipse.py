@@ -28,9 +28,17 @@ def test_ellipse_fitting():
     C = fit_dlt(pts)
     C = fit_nievergelt(pts, type='ellipse', scale=True)
     e = Ellipse.from_conic(C)
+
+    values1 = C(pts)
+    sse1 = np.inner(values1, values1)
+
     e = Ellipse([4.84, 4.979], [3.391, 3.391], 0)
 
-    # print(e.center, e.major_minor, e.alpha)
-
     e1 = e.refine(pts)
-    print(e1.center, e1.major_minor, e1.alpha)
+
+    C2 = e1.to_conic()
+
+    values2 = C2(pts)
+    sse2 = np.inner(values2, values2)
+
+    assert sse2 <= sse1

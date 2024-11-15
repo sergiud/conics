@@ -100,7 +100,6 @@ def _secular(s, y):
             l = res.root
 
     assert l < s2**2
-    # print('a b diff', a, b, diff)
     # l = -0.102179e-5
     np.testing.assert_almost_equal(_phi(l, s, y), 0)
 
@@ -226,7 +225,6 @@ def fit_nievergelt(pts, type='parabola', scale=False):
 
     Q = np.block([[A, b], [b.T, c]])
 
-    print(Q)
     C = Conic.from_homogeneous(Q)
 
     if scale:
