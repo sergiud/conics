@@ -7,14 +7,9 @@ on:
     types: [published]
 
 jobs:
-  deploy:
-    name: Publish to PyPI
-    runs-on: ubuntu-latest
-    environment:
-      name: PyPI
-      url: https://pypi.org/p/conics
-    permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+  build:
+    name: Build wheels using Python 3.13
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v4
@@ -31,5 +26,31 @@ jobs:
       - name: Build
         run: python -m build
 
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-package
+          path: dist/
+
+  deploy:
+    name: Publish to PyPI
+    if: ${{github.event_name == 'release' && github.action.name == 'published'}}
+    runs-on: ubuntu-24.04
+    needs: [build]
+    environment:
+      name: PyPI
+      url: https://pypi.org/p/conics
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: dist-*
+          path: dist/
+          merge-multiple: true
+
       - name: Publish
+        if:
         uses: pypa/gh-action-pypi-publish@release/v1
