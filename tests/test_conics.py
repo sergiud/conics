@@ -315,3 +315,35 @@ def test_complex_circle_intersection():
     inter = c1.intersect(c2)
 
     np.testing.assert_almost_equal(c(inter), 0)
+
+
+def test_evaluate_hnormalized():
+    c = Conic.from_homogeneous(np.eye(3))
+    pts = np.ones((2, 4))
+
+    values = c(pts)
+    np.testing.assert_array_equal(values, 3)
+
+
+def test_evaluate_homogeneous():
+    c = Conic.from_homogeneous(np.eye(3))
+    pts = np.ones((3, 4))
+
+    values = c(pts)
+    np.testing.assert_array_equal(values, 3)
+
+
+def test_evaluate_hnormalized_ndim():
+    c = Conic.from_homogeneous(np.eye(3))
+    pts = np.ones((2, 1, 1, 1, 4))
+
+    values = c(pts)
+    np.testing.assert_array_equal(values, 3)
+
+
+def test_evaluate_homogeneous_ndim():
+    c = Conic.from_homogeneous(np.eye(3))
+    pts = np.ones((3, 1, 1, 1, 4))
+
+    values = c(pts)
+    np.testing.assert_array_equal(values, 3)

@@ -35,11 +35,11 @@ s1, inter, s2 = control_points.T
 
 X, Y = np.meshgrid(np.linspace(np.min(x) - 1, np.max(x) + 1),
                    np.linspace(-1 + np.min(y), np.max(y) + 1))
-Z = C(np.vstack((X.ravel(), Y.ravel())))
+Z = C([X, Y])
 
 fig = plt.figure()
 
-plt.contour(X, Y, Z.reshape(X.shape), levels=0)
+plt.contour(X, Y, Z, levels=0)
 
 plt.scatter(*pts, label='observations')
 

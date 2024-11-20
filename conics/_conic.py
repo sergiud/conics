@@ -622,11 +622,12 @@ class Conic:
         s = np.shape(pts)
 
         if s[0] == 2:
-            x, y = pts
-            A = np.column_stack((x**2, x * y, y**2, x, y, np.ones_like(x)))
-            return A @ self.coeffs_
+            x, y = np.asarray(pts)
+            A, B, C, D, E, F = self.coeffs_
+            return A * x**2 + B * x * y + C * y**2 + D * x + E * y + F
 
-        return np.diagonal(pts.T @ self.homogeneous @ pts)
+        # np.einsum('ij...,jk...,ij...->i...', pts, C, pts)
+        return np.einsum('ji...,jk...,ji...->i...', pts, self.homogeneous, pts)
 
     @staticmethod
     def from_parabola(center, p, alpha):

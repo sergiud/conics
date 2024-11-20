@@ -31,7 +31,7 @@ C = fit_nievergelt(pts, type='parabola', scale=False)
 
 X, Y = np.meshgrid(np.linspace(np.min(x) - 3, np.max(x) + 1),
                    np.linspace(-1 + np.min(y), np.max(y) + 1))
-Z = C(np.vstack((X.ravel(), Y.ravel())))
+Z = C([X, Y])
 
 p = Parabola.from_conic(C)
 
@@ -40,17 +40,16 @@ C_refined = p_refined.to_conic()
 
 contact_pts = p_refined.contact(pts)
 
-Z_refined = C_refined(np.vstack((X.ravel(), Y.ravel())))
+Z_refined = C_refined([X, Y])
 
 plt.figure()
 plt.axis('equal')
 
-cs = plt.contour(X, Y, Z.reshape(X.shape), levels=0)
+cs = plt.contour(X, Y, Z, levels=0)
 cs.collections[1].set_label('fitted parabola')
 
 cs_refined = plt.contour(
-    X, Y, Z_refined.reshape(
-        X.shape), colors='red', levels=0)
+    X, Y, Z_refined, colors='red', levels=0)
 cs_refined.collections[1].set_label('refined parabola')
 
 plt.scatter(x, y, label='observations')
