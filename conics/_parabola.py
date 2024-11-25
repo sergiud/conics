@@ -27,14 +27,15 @@ class Parabola:
     canonic parbola by angle :math:`-\pi\leq\alpha<\pi` and shifting the vertex
     by :math:`\vec x_c\in\mathbb{R}^2`.
 
-    :param vertex: The 2-D coordinate of the parabola vertex.
-    :type vertex: numpy.ndarray
+    Parameters
+    ----------
+    vertex : numpy.ndarray
+        The 2-D coordinate of the parabola vertex.
+    p : float
+        The distance of the vertex to the focus.
+    alpha : float
+        The orientation of the parabola in the :math:`xy` plane.
 
-    :param p: The distance of the vertex to the focus.
-    :type p: float
-
-    :param alpha: The orientation of the parabola in the :math:`xy` plane.
-    :type alpha: float
     """
 
     def __init__(self, vertex, p, alpha):
@@ -54,16 +55,20 @@ class Parabola:
         R"""Computes the contact points on the parabola from the coordinates
         `pts`.
 
-        :param pts: :math:`N\times2` matrix of 2-D coordinates whose contact
+        Parameters
+        ----------
+        pts : numpy.ndarray
+            :math:`N\times2` matrix of 2-D coordinates whose contact
             points are to be determined.
-        :type pts: numpy.ndarray
-
-        :param kwargs: Additional arguments passed to
+        **kwargs
+            Additional arguments passed to
             :func:`scipy.optimize.least_squares`.
 
-        :return: :math:`N\times2` matrix of 2-D coordinates representing the
+        Returns
+        -------
+        numpy.ndarray
+            :math:`N\times2` matrix of 2-D coordinates representing the
             contact points.
-        :rtype: numpy.ndarray
         """
 
         pts = np.atleast_2d(pts)
@@ -111,14 +116,18 @@ class Parabola:
 
         The method implements the approach from :cite:`Ahn2001`.
 
-        :param pts: Observed 2-D coordinates of the parabola.
-        :type pts: numpy.ndarray
-
-        :param kwargs: Additional arguments passed to
+        Parameters
+        ----------
+        pts : numpy.ndarray
+            Observed 2-D coordinates of the parabola.
+        **kwargs
+            Additional arguments passed to
             :func:`scipy.optimize.least_squares`.
 
-        :return: The refined parabola.
-        :rtype: conics.Parabola
+        Returns
+        -------
+        conics.Parabola
+            The refined parabola.
         """
 
         def fun(a, pts):
@@ -173,8 +182,10 @@ class Parabola:
     def to_conic(self):
         """Converts the parabola to its general algebraic form.
 
-        :return: The conic representation of the parabola.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            The conic representation of the parabola.
         """
         return Conic.from_parabola(self.vertex, self.p, self.alpha)
 
@@ -182,7 +193,9 @@ class Parabola:
     def from_conic(C):
         """Constructs a parabola from its general algebraic form.
 
-        :return: The geometric representation of the parabola.
-        :rtype: conics.Parabola
+        Returns
+        -------
+        conics.Parabola
+            The geometric representation of the parabola.
         """
         return Parabola(*C.to_parabola())

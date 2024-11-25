@@ -72,10 +72,17 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
     'sphinxcontrib.bibtex',
 ]
+
+todo_include_todos = True
+autodoc_typehints = 'none'
+napoleon_google_docstring = False
+napoleon_numpy_docstring = True
+napoleon_use_ivar = False
 
 intersphinx_mapping = {
     'numpy': ('https://numpy.org/doc/stable', None),

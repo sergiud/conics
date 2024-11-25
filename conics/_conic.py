@@ -144,7 +144,8 @@ def surface_normal(Q, r=1):
 
 def projected_center(Q, n):
     """Provides the projected center of the circle in the camera coordinate
-    system."""
+    system.
+    """
     return np.linalg.solve(Q, n)
 
 
@@ -152,21 +153,24 @@ def estimate_pose(Q, r, alpha):
     r"""Estimates the 5-D camera pose with respect to the supporting plane of a
     circle projection :cite:`Chen2004`.
 
-    :param Q: :math:`3\times3` symmetric matrix that defines the oblique cone
-        given by  the rays passing through the center of the camera and the
-        circle projection.
-    :type Q: numpy.ndarray
+    Parameters
+    ----------
+    Q : numpy.ndarray
+        :math:`3\times3` symmetric matrix that defines the oblique cone
+        given by  the rays passing through the center of the camera and
+        the circle projection.
+    r : float
+        The radius of the projected circle.
+    alpha : float
+        The orientation of the projected circle, in radians.
 
-    :param r: The radius of the projected circle.
-    :type r: float
-
-    :param alpha: The orientation of the projected circle, in radians.
-    :type alpha: float
-
-    :return: Eight possible solutions :math:`(R_i,\vec t_i,\vec n_i,\vec
-        c,s_{1,i},s_{2,i},s_{3,i},m_i)`, :math:`i=1,\dotsc,8` that describe the
-        pose of the camera observing the circle projection and its supporting
-        plane.
+    Returns
+    -------
+    tuple
+        Eight possible solutions :math:`(R_i,\vec t_i,\vec n_i,\vec
+        c,s_{1,i},s_{2,i},s_{3,i},m_i)`, :math:`i=1,\dotsc,8` that
+        describe the pose of the camera observing the circle projection
+        and its supporting plane.
 
         :math:`R_i\in\mathsf{SO}(3)`
             The camera rotation.
@@ -183,7 +187,6 @@ def estimate_pose(Q, r, alpha):
         :math:`m_i\in\{0,1\}`
             A mask that defines which solutions are valid.
 
-    :rtype: tuple
     """
 
     evals, evecs = np.linalg.eigh(Q)
@@ -241,8 +244,10 @@ def estimate_pose(Q, r, alpha):
 class Conic:
     """Initializes the conic using the given coefficents.
 
-    :param args: Coeffcients of the quadratic curve.
-    :type args: array-like, optional
+    Parameters
+    ----------
+    args : array-like, optional
+        Coeffcients of the quadratic curve.
     """
 
     def __init__(self, *args):
@@ -266,8 +271,10 @@ class Conic:
     def center(self):
         """Returns the midpoint of a central conic :cite:`Ayoub1993`.
 
-        :return: 2-D coordinate of the conic center.
-        :rtype: numpy.ndarray
+        Returns
+        -------
+        numpy.ndarray
+            2-D coordinate of the conic center.
         """
         return self.__center(self.__C33)
 
@@ -307,13 +314,18 @@ class Conic:
         The method implements the algorithm introduced in
         :cite:`RichterGebert2011`.
 
-        :param other: The conic for which the intersections are to be computed.
-        :type other: Conic
+        Parameters
+        ----------
+        other : Conic
+            The conic for which the intersections are to be computed.
 
-        :return: A matrix of homogeneous 2-D points stored in column vectors of
-            a :math:`3\times N` matrix consisting of :math:`0\leq N\leq 4`
-            columns.
-        :rtype: numpy.ndarray
+        Returns
+        -------
+        numpy.ndarray
+            A matrix of homogeneous 2-D points stored in column vectors
+            of a :math:`3\times N` matrix consisting of :math:`0\leq
+            N\leq 4` columns.
+
 
         .. plot:: ../examples/intersections.py
         """
@@ -431,17 +443,19 @@ class Conic:
     def from_ellipse(x0, major_minor, alpha):
         """Constructs a conic section from ellipse parameters.
 
-        :param x0: The 2-D center of the ellipse.
-        :type x0: array-like
+        Parameters
+        ----------
+        x0 : array-like
+            The 2-D center of the ellipse.
+        major_minor : array-like
+            The size of the half axes.
+        angle : float
+            The orientation of the ellipse in radians.
 
-        :param major_minor: The size of the half axes.
-        :type major_minor: array-like
-
-        :param angle: The orientation of the ellipse in radians.
-        :type angle: float
-
-        :return: The ellipse conic.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            The ellipse conic.
         """
         return Conic(g2a(x0, major_minor, alpha))
 
@@ -449,14 +463,17 @@ class Conic:
     def from_circle(x0, r):
         """Constructs a conic from geometric representation of a circle.
 
-        :param x0: The 2-D center of the circle.
-        :type x0: array-like
+        Parameters
+        ----------
+        x0 : array-like
+            The 2-D center of the circle.
+        r : float
+            The circle radius.
 
-        :param r: The circle radius.
-        :type r: float
-
-        :return: The circle conic.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            The circle conic.
         """
 
         return Conic.from_homogeneous(_make_circle(x0, r))
@@ -464,11 +481,13 @@ class Conic:
     def to_ellipse(self):
         R"""Returns the geometric representation of the ellipse conic.
 
-        :return: A tuple containing the ellipse center :math:`\vec
-            x_c\in\mathbb{R}^2`, the length of the semi-major and semi-minor axes
-            :math:`(a,b)\in\mathbb{R}_{>0}^2`, and the ellipse orientation
-            :math:`-\pi\leq\alpha<\pi`.
-        :rtype: tuple
+        Returns
+        -------
+        tuple
+            A tuple containing the ellipse center :math:`\vec
+            x_c\in\mathbb{R}^2`, the length of the semi-major and semi-
+            minor axes :math:`(a,b)\in\mathbb{R}_{>0}^2`, and the
+            ellipse orientation :math:`-\pi\leq\alpha<\pi`.
         """
 
         C33 = self.__C33
@@ -480,10 +499,15 @@ class Conic:
         r"""Constructs a conic section from its homogeneous :math:`3\times3`
         symmetric matrix representation.
 
-        :return: New conic section
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            New conic section
 
-        :except ValueError: Raised if the `Q` is not symmetric.
+        Raises
+        ------
+        ValueError
+            Raised if the `Q` is not symmetric.
         """
 
         if not np.isclose(Q - Q.T, np.zeros_like(Q)).all():
@@ -502,20 +526,25 @@ class Conic:
 
         See :cite:`Hartley2004` for details.
 
-        :param R: The applied homography on the right hand-side of the original conic section (unless `L` is given)
-        :type R: numpy.ndarray
-
-        :param L: The applied homography on the left hand-side of the original conic section. If not given, the transform is computed as the transpose of `R`.
-        :type L: numpy.ndarray
-
-        :param invert: Indicates whether the inverse of the homography will be
-            used to transform the conic. Set to `True` if you intend to
+        Parameters
+        ----------
+        R : numpy.ndarray
+            The applied homography on the right hand-side of the
+            original conic section (unless `L` is given)
+        L : numpy.ndarray
+            The applied homography on the left hand-side of the original
+            conic section. If not given, the transform is computed as
+            the transpose of `R`.
+        invert : bool
+            Indicates whether the inverse of the homography will be used
+            to transform the conic. Set to `True` if you intend to
             transform the points on the conic (default). If `False`, the
             transformation is applied as is without inversion.
-        :type invert: bool
 
-        :return: The transform conic section.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            The transform conic section.
         """
 
         if invert:
@@ -529,12 +558,16 @@ class Conic:
     def translate(self, t):
         """Shifts the points on the conic by a 2-D translation vector `t`.
 
-        :param t: 2-D translation vector by which the points on the conic are
+        Parameters
+        ----------
+        t : array-like
+            2-D translation vector by which the points on the conic are
             shifted.
-        :type t: array-like
 
-        :return: The shifted conic.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            The shifted conic.
         """
         t = np.reshape(t, (2, 1))
         M = np.block([[np.eye(2), -t],
@@ -544,16 +577,19 @@ class Conic:
     def scale(self, sx, sy=None):
         R"""Scales the conic coordinates.
 
-        :param sx: Scale factor along the horizontal axis:
-        :type sx: float
+        Parameters
+        ----------
+        sx : float
+            Scale factor along the horizontal axis:
+        sy : float, None
+            Scale factor along the vertical axis. If other than `None`,
+            the scaling is non-uniform. Otherwise the same factor as for
+            the horizontal axis is used.
 
-        :param sy: Scale factor along the vertical axis. If other than `None`,
-            the scaling is non-uniform. Otherwise the same factor as for the
-            horizontal axis is used.
-        :type sy: float, None
-
-        :return: Scaled conic.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            Scaled conic.
         """
 
         s = np.stack((sx, sx if sy is None else sy)).ravel()
@@ -566,11 +602,15 @@ class Conic:
         """Rotates the `points` on the conic in the counter-clockwise
         direction.
 
-        :param angle: The counter-clockwise rotation angle, in radians.
-        :type angle: float
+        Parameters
+        ----------
+        angle : float
+            The counter-clockwise rotation angle, in radians.
 
-        :return: The rotated conic section.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            The rotated conic section.
         """
         M = np.block([[rot2d(-angle), np.zeros((2, 1))],
                       [0, 0, 1]])
@@ -594,11 +634,16 @@ class Conic:
 
         Since :math:`n=3`, it follows that :math:`k=\sqrt[3]{\frac{d}{\det C}}`.
 
-        :param d: The determinant value the matrix form the conic should obtain.
-        :type d: float
+        Parameters
+        ----------
+        d : float
+            The determinant value the matrix form the conic should
+            obtain.
 
-        :return: The normalized conic.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            The normalized conic.
         """
         C = self.homogeneous
         k = np.cbrt(d / np.linalg.det(C))
@@ -633,17 +678,19 @@ class Conic:
 
         The conversion uses the method from :cite:`Ahn2001`.
 
-        :param center: The 2-D coordinate of the parabola vertex.
-        :type center: numpy.ndarray
+        Parameters
+        ----------
+        center : numpy.ndarray
+            The 2-D coordinate of the parabola vertex.
+        p : float
+            The distance from the focus.
+        alpha : float
+            Parabola orientation (in radians).
 
-        :param p: The distance from the focus.
-        :type p: float
-
-        :param alpha: Parabola orientation (in radians).
-        :type alpha: float
-
-        :return: New conic section.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            New conic section.
         """
 
         if p < 0:
@@ -668,10 +715,12 @@ class Conic:
         R"""Returns the geometric representation of the parabola given by the
         current conic.
 
-        :return: 2-D coordinate :math:`\vec x_c\in\mathbb{R}^2` of the parabola vertex, the distance
-            :math:`p>0` from the focus and the parabola orientation
-            :math:`-\pi\leq\alpha<\pi`.
-        :rtype: tuple
+        Returns
+        -------
+        tuple
+            2-D coordinate :math:`\vec x_c\in\mathbb{R}^2` of the
+            parabola vertex, the distance :math:`p>0` from the focus and
+            the parabola orientation :math:`-\pi\leq\alpha<\pi`.
         """
 
         A, B, C, D, E, F = self.coeffs_ / Conic.__factors()
@@ -712,11 +761,15 @@ class Conic:
             \end{bmatrix}
             \enspace .
 
-        :param pts: 2-D coordinates where the gradient is evaluated.
-        :type pts: numpy.ndarray
+        Parameters
+        ----------
+        pts : numpy.ndarray
+            2-D coordinates where the gradient is evaluated.
 
-        :return: The gradient vector with respect to each 2-D coordinate.
-        :rtype: numpy.ndarray
+        Returns
+        -------
+        numpy.ndarray
+            The gradient vector with respect to each 2-D coordinate.
         """
 
         a, b, c, d, e, f = self.coeffs_
@@ -730,21 +783,24 @@ class Conic:
     def constrain(self, pts, type='parabola', fix_angle=False):
         R"""Conditions the conic to a specific type and specific properties.
 
-        :param pts: :math:`n` 2-D coordinates given by a :math:`2\times n` matrix
-            where each coordinate is stored in a column. The conditioning is
-            performed with respect to the specified coordinates.
-        :type pts: numpy.ndarray
+        Parameters
+        ----------
+        pts : numpy.ndarray
+            :math:`n` 2-D coordinates given by a :math:`2\times n`
+            matrix where each coordinate is stored in a column. The
+            conditioning is performed with respect to the specified
+            coordinates.
+        type : str
+            Desired conic type. Possible choice is only ``parabola``.
+        fix_angle : bool, float
+            Specifies whether to fix the angle to the current
+            configuration or use a specific value given by the argument
+            in radians.
 
-        :param type: Desired conic type. Possible choice is only ``parabola``.
-        :type type: str
-
-        :param fix_angle: Specifies whether to fix the angle to the current
-            configuration or use a specific value given by the argument in
-            radians.
-        :type fix_angle: bool, float
-
-        :return: The constrained conic.
-        :rtype: conics.Conic
+        Returns
+        -------
+        conics.Conic
+            The constrained conic.
         """
 
         if type != 'parabola':

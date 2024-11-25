@@ -30,11 +30,15 @@ def fit_dlt(pts):
 
     The resulting conic is not guaranteed to be of any specific type.
 
-    :param pts: A set of 2-D coordinates to fit the conic to.
-    :type pts: numpy.ndarray
+    Parameters
+    ----------
+    pts : numpy.ndarray
+        A set of 2-D coordinates to fit the conic to.
 
-    :return: The estimated conic.
-    :rtype: conics.Conic
+    Returns
+    -------
+    conics.Conic
+        The estimated conic.
     """
     x, y = pts
 
@@ -49,28 +53,32 @@ def parabola_to_bezier(parabola, start, end):
     R"""Determines the control points of a quadratic Bezier curve that exactly
     represents given `parabola`.
 
-    :param parabola: A parabola whose Bezier control points should be
-        determined.
-    :type parabola: conics.Parabola
-
-    :param start: Starting 2-D coordinate on or around the curve from which the
-        first control point is determined. The coordinate does not need to be
-        lying exactly on the parabola. The method uses the coordinate to
-        determine the shortest (orthogonal) distance contact point using
-        :func:`conics.Parabola.contact`.
-    :type start: numpy.ndarray
-
-    :param end: Similar to the `start` parameter, denotes the outer point from
+    Parameters
+    ----------
+    parabola : conics.Parabola
+        A parabola whose Bezier control points should be determined.
+    start : numpy.ndarray
+        Starting 2-D coordinate on or around the curve from which the
+        first control point is determined. The coordinate does not need
+        to be lying exactly on the parabola. The method uses the
+        coordinate to determine the shortest (orthogonal) distance
+        contact point using :func:`conics.Parabola.contact`.
+    end : numpy.ndarray
+        Similar to the `start` parameter, denotes the outer point from
         which the final control point is determined.
-    :type end: numpy.ndarray
 
-    :return: A :math:`2\times3` matrix of whose columns denote the three control
-        points of the Bezier curve.
-    :rtype: numpy.ndarray
+    Returns
+    -------
+    numpy.ndarray
+        A :math:`2\times3` matrix of whose columns denote the three
+        control points of the Bezier curve.
 
-    :except ValueError: Thrown if the slopes on the outer contact points of the
-        parabolic curve do not intersect. In this case, the parabola may be
-        degenerate and correspond, e.g., to a straight line.
+    Raises
+    ------
+    ValueError
+        Thrown if the slopes on the outer contact points of the
+        parabolic curve do not intersect. In this case, the parabola may
+        be degenerate and correspond, e.g., to a straight line.
     """
 
     s1, s2 = parabola.contact(np.column_stack((start, end))).T

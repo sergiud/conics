@@ -131,17 +131,19 @@ def fit_nievergelt(pts, type='parabola', scale=False):
 
     The method implements the approach proposed in :cite:`Nievergelt2004`.
 
-    :param pts: 2-D array of coordinates to fit the conic to.
-    :type pts: numpy.ndarray
-
-    :param type: The desired conic type. `None` if no specific conic type is
+    Parameters
+    ----------
+    pts : numpy.ndarray
+        2-D array of coordinates to fit the conic to.
+    type : str, None
+        The desired conic type. `None` if no specific conic type is
         desired, or `ellipse`, `parabola`, or `hyperbola`.
-    :type type: str, None
+    scale : bool
+        Scale points to unit standard deviation along each axis. Scaling
+        generally improves the numerical robustness of the fit
+        :cite:`Harker2004`. The original method does not scale the
+        points.
 
-    :param scale: Scale points to unit standard deviation along each axis.
-        Scaling generally improves the numerical robustness of the fit
-        :cite:`Harker2004`. The original method does not scale the points.
-    :type scale: bool
     """
     mean = np.mean(pts, axis=1)
     centered = pts - mean[..., np.newaxis]
