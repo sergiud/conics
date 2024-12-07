@@ -1,7 +1,7 @@
 default:
   tags:
     - docker
-  image: sergiud/conics
+  image: sergiud/conics:python3.12
 
 .env_template: &env_definition
   - export PYTHONWARNINGS=error
@@ -10,7 +10,7 @@ default:
   stage: test
   allow_failure: true
   script:
-    - autopep8 --exit-code --diff -r .
+    - black --check --diff .
     - flake8 .
     - isort --check-only --diff .
 

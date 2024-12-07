@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -45,7 +44,7 @@ def _phi(l, s, y):
         {y}_{1}^{2}}{\left(\lambda - {\sigma}_{1}^{2}\right)^{2}}-1
     """
     num, den = _phi_frac(l, s, y)
-    return np.sum((num / den)**2, axis=0) - 1
+    return np.sum((num / den) ** 2, axis=0) - 1
 
 
 def _phi_prime(l, s, y):
@@ -95,8 +94,16 @@ def _secular(s, y):
             # l2 = s2*(s2-np.abs(y2))
             l2 = s2**2 - np.abs(s2 * y2)
 
-            res = scipy.optimize.root_scalar(_phi, args=(s, y), method='halley', bracket=(l1, l2),
-                                             x0=l2, x1=l2, fprime=_phi_prime, fprime2=_phi_prime2)
+            res = scipy.optimize.root_scalar(
+                _phi,
+                args=(s, y),
+                method='halley',
+                bracket=(l1, l2),
+                x0=l2,
+                x1=l2,
+                fprime=_phi_prime,
+                fprime2=_phi_prime2,
+            )
             l = res.root
 
     assert l < s2**2
@@ -177,7 +184,7 @@ def fit_nievergelt(pts, type='parabola', scale=False):
 
     if np.isclose(k22_inv, 0):
         c = 0
-        w = np.zeros((3, ), dtype=pts.dtype)
+        w = np.zeros((3,), dtype=pts.dtype)
 
         # Fit TLS line
         A = np.column_stack((x, y))
@@ -209,9 +216,7 @@ def fit_nievergelt(pts, type='parabola', scale=False):
 
         sqrt2 = np.sqrt(2)
 
-        Z = np.array([[-1, 0, 1],
-                      [0, sqrt2, 0],
-                      [1, 0, 1]])
+        Z = np.array([[-1, 0, 1], [0, sqrt2, 0], [1, 0, 1]])
         Z /= sqrt2
 
         c2b = solve_triangular(R11, -R12 @ q)

@@ -134,5 +134,5 @@ html_theme_options = {
 
 mathjax3_config = {
     'loader': {'load': ['[tex]/mathtools']},
-    'tex': {'packages': {'[+]': ['mathtools']}}
+    'tex': {'packages': {'[+]': ['mathtools']}},
 }

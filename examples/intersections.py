@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>

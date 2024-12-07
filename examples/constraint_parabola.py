@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -31,8 +30,10 @@ C2 = C1.constrain(pts)
 
 C3 = fit_nievergelt(pts)
 
-X, Y = np.meshgrid(np.linspace(np.min(x) - 1, np.max(x) + 1),
-                   np.linspace(-1 + np.min(y), np.max(y) + 1))
+X, Y = np.meshgrid(
+    np.linspace(np.min(x) - 1, np.max(x) + 1),
+    np.linspace(-1 + np.min(y), np.max(y) + 1),
+)
 Z1 = C1([X, Y])
 Z2 = C2([X, Y])
 Z3 = C3([X, Y])

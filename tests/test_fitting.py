@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -24,20 +23,20 @@ import numpy as np
 
 def test_nievergelt_up_parabola():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = +x**2
+    y = +(x**2)
 
     C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
-    np.testing.assert_array_almost_equal(vertex, np.zeros((2, )))
+    np.testing.assert_array_almost_equal(vertex, np.zeros((2,)))
     np.testing.assert_approx_equal(p, 0.5)
     np.testing.assert_approx_equal(alpha, np.pi / 2)
 
 
 def test_nievergelt_up_parabola_shifted():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = +x**2 + 5
+    y = +(x**2) + 5
 
     C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
@@ -50,7 +49,7 @@ def test_nievergelt_up_parabola_shifted():
 
 def test_nievergelt_up_parabola_shifted1():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = +x**2 + 10 * x + 5
+    y = +(x**2) + 10 * x + 5
 
     C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
@@ -63,20 +62,20 @@ def test_nievergelt_up_parabola_shifted1():
 
 def test_nievergelt_down_parabola():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = -x**2
+    y = -(x**2)
 
     C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
-    np.testing.assert_array_almost_equal(vertex, np.zeros((2, )))
+    np.testing.assert_array_almost_equal(vertex, np.zeros((2,)))
     np.testing.assert_approx_equal(p, 0.5)
     np.testing.assert_approx_equal(alpha, -np.pi / 2)
 
 
 def test_nievergelt_down_parabola_shifted():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = -x**2 + 5
+    y = -(x**2) + 5
 
     C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
@@ -89,7 +88,7 @@ def test_nievergelt_down_parabola_shifted():
 
 def test_nievergelt_down_parabola_shifted1():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = -x**2 + 10 * x + 5
+    y = -(x**2) + 10 * x + 5
 
     C = fit_nievergelt(np.vstack((x, y)), type='parabola')
 
@@ -128,20 +127,20 @@ def test_nievergelt_spaeth_parabola2():
 
 def test_harker_up_parabola():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = +x**2
+    y = +(x**2)
 
     C = fit_harker(np.vstack((x, y)), type='parabola')
 
     vertex, p, alpha = C.to_parabola()
 
-    np.testing.assert_array_almost_equal(vertex, np.zeros((2, )))
+    np.testing.assert_array_almost_equal(vertex, np.zeros((2,)))
     np.testing.assert_approx_equal(p, 0.5)
     np.testing.assert_approx_equal(alpha, np.pi / 2)
 
 
 def test_harker_up_parabola_shifted():
     x = np.array([-4, -2, -1, 0, 1, 2, 4])
-    y = +x**2 + 5
+    y = +(x**2) + 5
 
     C = fit_harker(np.vstack((x, y)), type='parabola')
 

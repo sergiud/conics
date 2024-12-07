@@ -1,7 +1,6 @@
-
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,8 +28,12 @@ def _cost_contact_point(a, b, x, y, xi, yi):
 
 
 def _jac_contact_point(a, b, x, y, xi, yi):
-    Q = np.array([[b**2 * x, a**2 * y],
-                  [(a**2 - b**2) * y + b**2 * yi, (a**2 - b**2) * x - a**2 * xi]])
+    Q = np.array(
+        [
+            [b**2 * x, a**2 * y],
+            [(a**2 - b**2) * y + b**2 * yi, (a**2 - b**2) * x - a**2 * xi],
+        ]
+    )
 
     return Q
 
@@ -70,11 +73,7 @@ class Ellipse:
         tmp = np.sqrt(a**2 - xi**2, out=np.zeros_like(xi), where=mask)
 
         xk21 = np.vstack((xi, np.copysign(b / a * tmp, yi)))
-        xk22 = np.vstack(
-            (np.copysign(
-                a * np.ones_like(xi),
-                xi),
-                np.zeros_like(xi)))
+        xk22 = np.vstack((np.copysign(a * np.ones_like(xi), xi), np.zeros_like(xi)))
 
         xk2 = np.where(mask, xk21, xk22)
 
@@ -82,7 +81,7 @@ class Ellipse:
         x = np.empty_like(pts1)
 
         for i, (x0i, xyi) in enumerate(zip(x0.T, pts1.T)):
-            r = least_squares(fun, np.ravel(x0i), args=(xyi, ), jac=jac)
+            r = least_squares(fun, np.ravel(x0i), args=(xyi,), jac=jac)
             x[:, i] = r.x
 
         return R @ x + center
@@ -129,16 +128,11 @@ class Ellipse:
 
             xyxyips = np.sum(xyxyip * np.array([[1], [-1]]), axis=0)
 
-            B1 = np.array([[b2 * x * c - a2 * y * s],
-                           [b2 * dyi * c + a2 * dxi * s]])
-            B2 = np.array([[b2 * x * s + a2 * y * c],
-                           [b2 * dyi * s - a2 * dxi * c]])
-            B3 = np.array([[a * (b2 - y2)],
-                           [+2 * a * y * dxi]])
-            B4 = np.array([[b * (a2 - x2)],
-                           [-2 * b * x * dyi]])
-            B5 = np.array([[(a2 - b2) * xyp],
-                           [(a2 - b2) * (x2 - y2 - xyxyips)]])
+            B1 = np.array([[b2 * x * c - a2 * y * s], [b2 * dyi * c + a2 * dxi * s]])
+            B2 = np.array([[b2 * x * s + a2 * y * c], [b2 * dyi * s - a2 * dxi * c]])
+            B3 = np.array([[a * (b2 - y2)], [+2 * a * y * dxi]])
+            B4 = np.array([[b * (a2 - x2)], [-2 * b * x * dyi]])
+            B5 = np.array([[(a2 - b2) * xyp], [(a2 - b2) * (x2 - y2 - xyxyips)]])
 
             B = np.column_stack([B1, B2, B3, B4, B5])
             B = np.moveaxis(B, -1, 0)
@@ -151,7 +145,7 @@ class Ellipse:
             return J.reshape(-1, 5, order='C')
 
         x0 = np.stack((*self.center, *self.major_minor, self.alpha))
-        r = least_squares(fun, x0, args=(pts, ), jac=jac)
+        r = least_squares(fun, x0, args=(pts,), jac=jac)
 
         return Ellipse(r.x[:2], r.x[2:4], r.x[-1])
 

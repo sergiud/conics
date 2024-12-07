@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -22,8 +21,9 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 
-pts = np.asarray([[.35, 1.2], [1.5, 1.2], [-2.3, 4.2], [-1, -1.2], [0, -2], [-1,
-                                                                             -3]]).T
+pts = np.asarray(
+    [[0.35, 1.2], [1.5, 1.2], [-2.3, 4.2], [-1, -1.2], [0, -2], [-1, -3]]
+).T
 
 pts = np.array([[1, 2, 5, 7, 9, 3, 6, 8], [7, 6, 8, 7, 5, 7, 2, 4]])
 # pts = np.array([ [1, 2, 5, 7, 9, 6, 3, 8], [7, 6, 8, 7, 5, 7, 2, 4]])
@@ -37,12 +37,26 @@ e1 = e.refine(pts)
 contact_pts = e.contact(pts)
 
 width, height = 2 * np.asarray(e.major_minor)
-ee = mpatches.Ellipse(e.center, width, height, np.rad2deg(e.alpha), edgecolor='red',
-                      facecolor='none', lw=2)
+ee = mpatches.Ellipse(
+    e.center,
+    width,
+    height,
+    np.rad2deg(e.alpha),
+    edgecolor='red',
+    facecolor='none',
+    lw=2,
+)
 
 width1, height1 = 2 * np.asarray(e1.major_minor)
-ee1 = mpatches.Ellipse(e1.center, width1, height1, np.rad2deg(e1.alpha),
-                       edgecolor='blue', facecolor='none', lw=2)
+ee1 = mpatches.Ellipse(
+    e1.center,
+    width1,
+    height1,
+    np.rad2deg(e1.alpha),
+    edgecolor='blue',
+    facecolor='none',
+    lw=2,
+)
 
 plt.figure()
 plt.axis('equal')

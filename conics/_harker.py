@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -65,7 +64,7 @@ def _compute_parabola(M):
     gamma5 = -4 * e13 * e31 + 2 * e12 * e32 - 4 * e11 * e33  # t
     gamma6 = e32**2 - 4 * e31 * e33  # constant term
 
-    alpha1, alpha2 = evals[:2]**2
+    alpha1, alpha2 = evals[:2] ** 2
     alpha3 = alpha1 * alpha2
 
     k1 = 4 * gamma3 * gamma6 - gamma5**2
@@ -79,8 +78,11 @@ def _compute_parabola(M):
 
     K0 = 16 * gamma6 * alpha3**2
     K1 = -8 * alpha3 * (k1 * alpha2 + k4 * alpha1)
-    K2 = 4 * ((2 * gamma2 * k2 + 4 * k8) * alpha3 + gamma1 *
-              k4 * alpha1**2 + gamma3 * K1 * alpha2**2)
+    K2 = 4 * (
+        (2 * gamma2 * k2 + 4 * k8) * alpha3
+        + gamma1 * k4 * alpha1**2
+        + gamma3 * K1 * alpha2**2
+    )
     K3 = 2 * k7 * k8
     K4 = k5 * k8
 
@@ -121,15 +123,19 @@ def _denormalize(z, scale_inv, mean):
     K = Conic(z)
 
     TT = scale_inv * np.eye(2)
-    T = np.block([[TT, -scale_inv * mean[..., np.newaxis]],
-                  [0, 0, 1]])
+    T = np.block([[TT, -scale_inv * mean[..., np.newaxis]], [0, 0, 1]])
 
     return K.transform(T, invert=False)
 
 
 def _diff2_mu_sqr_error(mu, Q0, Q1, Q2, R0, R1, R2):
-    return 2 * (2 * Q2 * mu + Q1) / (R2 * mu**2 + R1 * mu + R0)**2 - 4 * (Q2 *
-                                                                          mu**2 + Q1 * mu + Q0) * (2 * R2 * mu + R1) / (R2 * mu**2 + R1 * mu + R0)**3
+    return (
+        2 * (2 * Q2 * mu + Q1) / (R2 * mu**2 + R1 * mu + R0) ** 2
+        - 4
+        * (Q2 * mu**2 + Q1 * mu + Q0)
+        * (2 * R2 * mu + R1)
+        / (R2 * mu**2 + R1 * mu + R0) ** 3
+    )
 
 
 def _correct_bias(pts, S11, S21, S22, z_e, z_h, x2m, xym, y2m, k_e, k_h):
@@ -142,8 +148,7 @@ def _correct_bias(pts, S11, S21, S22, z_e, z_h, x2m, xym, y2m, k_e, k_h):
     Dy = np.column_stack((zeros, x, 2 * y, zeros, ones))
 
     Sxy = Dx.T @ Dx + Dy.T @ Dy
-    S = np.block([[S22, S21],
-                  [S21.T, S11]])
+    S = np.block([[S22, S21], [S21.T, S11]])
 
     sigma1 = z_e.T @ S @ z_e
     sigma2 = z_e.T @ S @ z_h
@@ -152,10 +157,15 @@ def _correct_bias(pts, S11, S21, S22, z_e, z_h, x2m, xym, y2m, k_e, k_h):
     sigma5 = z_e.T @ Sxy @ z_h
     sigma6 = z_h.T @ Sxy @ z_h
 
-    Q2 = sigma2 * sigma4 - sigma2 * sigma6 - sigma3 * sigma4 + \
-        sigma3 * sigma5 - sigma1 * sigma5 + sigma1 * sigma6
-    Q1 = sigma3 * sigma4 + 2 * sigma1 * sigma5 - \
-        sigma1 * sigma6 - 2 * sigma2 * sigma4
+    Q2 = (
+        sigma2 * sigma4
+        - sigma2 * sigma6
+        - sigma3 * sigma4
+        + sigma3 * sigma5
+        - sigma1 * sigma5
+        + sigma1 * sigma6
+    )
+    Q1 = sigma3 * sigma4 + 2 * sigma1 * sigma5 - sigma1 * sigma6 - 2 * sigma2 * sigma4
     Q0 = sigma2 * sigma4 - sigma1 * sigma5
 
     mu12 = np.roots([Q2, Q1, Q0])
@@ -216,7 +226,8 @@ def fit_harker(pts, type):
     normalized = centered * scale_inv
 
     S11, S21, S22, x2m, xym, y2m = _build_scatter_matrices(
-        normalized.astype(scale.dtype))
+        normalized.astype(scale.dtype)
+    )
 
     M, S11invS21T = _build_reduced_scatter_matrix(S11, S21, S22)
 
@@ -226,8 +237,9 @@ def fit_harker(pts, type):
         if type == 'ellipse':
             Btop = _partial_backsubstitute(S11invS21T)
             z_e, z_h = (Btop @ np.column_stack((z2_e, z2_h))).T
-            z = _correct_bias(normalized, S11, S21, S22, z_e, z_h, x2m, xym,
-                              y2m, k_e, k_h)
+            z = _correct_bias(
+                normalized, S11, S21, S22, z_e, z_h, x2m, xym, y2m, k_e, k_h
+            )
         else:  # hyperbola
             z = _backsubstitute(S11invS21T, z2_h, x2m, xym, y2m)
     elif type == 'parabola':
@@ -262,8 +274,10 @@ if __name__ == '__main__':
 
     C = fit_harker(pts, type='ellipse')
 
-    X, Y = np.meshgrid(np.linspace(np.min(pts[0]) - 1, np.max(pts[0]) + 1),
-                       np.linspace(-1 + np.min(pts[1]), np.max(pts[1]) + 1))
+    X, Y = np.meshgrid(
+        np.linspace(np.min(pts[0]) - 1, np.max(pts[0]) + 1),
+        np.linspace(-1 + np.min(pts[1]), np.max(pts[1]) + 1),
+    )
     Z = C(np.vstack((X.ravel(), Y.ravel())))
 
     plt.figure()

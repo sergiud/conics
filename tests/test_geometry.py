@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -32,5 +31,4 @@ def test_intersecting_lines():
     np.testing.assert_(not np.isclose(p[-1], 0))
 
     np.testing.assert_array_equal(hnormalized(p), 0.5)
-    np.testing.assert_array_equal(homogeneous(
-        [0.5, 0.5]), np.atleast_2d(p / p[-1]).T)
+    np.testing.assert_array_equal(homogeneous([0.5, 0.5]), np.atleast_2d(p / p[-1]).T)

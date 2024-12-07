@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -29,8 +28,10 @@ pts = np.vstack((x, y))
 
 C = fit_nievergelt(pts, type='parabola', scale=False)
 
-X, Y = np.meshgrid(np.linspace(np.min(x) - 3, np.max(x) + 1),
-                   np.linspace(-1 + np.min(y), np.max(y) + 1))
+X, Y = np.meshgrid(
+    np.linspace(np.min(x) - 3, np.max(x) + 1),
+    np.linspace(-1 + np.min(y), np.max(y) + 1),
+)
 Z = C([X, Y])
 
 p = Parabola.from_conic(C)
@@ -48,8 +49,7 @@ plt.axis('equal')
 cs = plt.contour(X, Y, Z, levels=0)
 cs.collections[1].set_label('fitted parabola')
 
-cs_refined = plt.contour(
-    X, Y, Z_refined, colors='red', levels=0)
+cs_refined = plt.contour(X, Y, Z_refined, colors='red', levels=0)
 cs_refined.collections[1].set_label('refined parabola')
 
 plt.scatter(x, y, label='observations')

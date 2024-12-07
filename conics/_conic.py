@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -25,8 +24,7 @@ import warnings
 
 def _make_circle(x0, r):
     x0 = np.reshape(x0, (2, 1))
-    C = np.block([[np.eye(2), -x0],
-                  [-x0.T, x0.T @ x0 - r**2]])
+    C = np.block([[np.eye(2), -x0], [-x0.T, x0.T @ x0 - r**2]])
     return C
 
 
@@ -63,7 +61,10 @@ def concentric_conics_vanishing_line(C1, C2):
 
 def g2a(x0, major_minor, alpha):
     if np.less(*major_minor):
-        warnings.warn('ellipse major axis size must be larger or equal to the minor one. however, the provided major axis is smaller than the minor axis. this may cause an unintentional change of ellipise orientation', UserWarning)
+        warnings.warn(
+            'ellipse major axis size must be larger or equal to the minor one. however, the provided major axis is smaller than the minor axis. this may cause an unintentional change of ellipise orientation',
+            UserWarning,
+        )
 
     x0 = np.asarray(x0)
     R = rot2d(alpha)
@@ -203,8 +204,7 @@ def estimate_pose(Q, r, alpha):
     h = np.sqrt((lambda1 - lambda2) / den13)
 
     # 2^3 possibilities to arrange [+1,-1] in three positions
-    s1, s2, s3 = np.array(
-        list(itertools.product(*itertools.repeat([+1, -1], 3)))).T
+    s1, s2, s3 = np.array(list(itertools.product(*itertools.repeat([+1, -1], 3)))).T
     alpha = alpha * np.ones_like(s1)
 
     den = np.sqrt(-lambda1 * lambda3)
@@ -218,23 +218,32 @@ def estimate_pose(Q, r, alpha):
     n = evecs @ np.moveaxis(right, -1, 0)
 
     # Expand z0 dimensions to enable correct broadcasting for the multiplication with a scalar.
-    left = np.array(
-        [[lambda3 / lambda2], [0], [lambda1 / lambda2]])[..., np.newaxis]
+    left = np.array([[lambda3 / lambda2], [0], [lambda1 / lambda2]])[..., np.newaxis]
 
-    c = z0[..., np.newaxis, np.newaxis] * \
-        evecs @ np.moveaxis(left * right, -1, 0)
+    c = z0[..., np.newaxis, np.newaxis] * evecs @ np.moveaxis(left * right, -1, 0)
 
     cos_a = np.cos(alpha)
     sin_a = np.sin(alpha)
 
-    R = evecs @ np.moveaxis(np.array([[g * cos_a, s1 * g * sin_a, s2 * h],
-                                      [sin_a, -s1 * cos_a, np.zeros_like(s1)],
-                                      [s1 * s2 * h * cos_a, s2 * h * sin_a, -s1 * g]]), -1, 0)
+    R = evecs @ np.moveaxis(
+        np.array(
+            [
+                [g * cos_a, s1 * g * sin_a, s2 * h],
+                [sin_a, -s1 * cos_a, np.zeros_like(s1)],
+                [s1 * s2 * h * cos_a, s2 * h * sin_a, -s1 * g],
+            ]
+        ),
+        -1,
+        0,
+    )
 
     factor = np.sqrt((lambda1 - lambda2) * (lambda2 - lambda3)) / lambda2
-    t = np.array([[-s2 * factor * cos_a],
-                  [-s1 * s2 * factor * sin_a],
-                  [np.ones_like(s1)]]) * z0
+    t = (
+        np.array(
+            [[-s2 * factor * cos_a], [-s1 * s2 * factor * sin_a], [np.ones_like(s1)]]
+        )
+        * z0
+    )
     t = np.moveaxis(t, -1, 0)
     mask = np.ravel((n[:, -1, :] > 0) & (c[:, -1, :] < 0))
 
@@ -251,9 +260,14 @@ class Conic:
     """
 
     def __init__(self, *args):
-        if not (len(args) == 0 or (len(args) == 1 and np.size(*args) == 6) or len(args) == 6):
+        if not (
+            len(args) == 0 or (len(args) == 1 and np.size(*args) == 6) or len(args) == 6
+        ):
             raise ValueError(
-                'unexpected number of arguments; expected 0, 1 or 6 arguments but got {}'.format(len(args)))
+                'unexpected number of arguments; expected 0, 1 or 6 arguments but got {}'.format(
+                    len(args)
+                )
+            )
 
         self.coeffs_ = np.ravel(args)
 
@@ -304,9 +318,7 @@ class Conic:
         """
         A, B, C, D, E, F = self.coeffs_ / Conic.__factors()
 
-        return np.array([[A, B, D],
-                         [B, C, E],
-                         [D, E, F]])
+        return np.array([[A, B, D], [B, C, E], [D, E, F]])
 
     def intersect(self, other):
         r"""Computes the intersections of `self` with another conic.
@@ -357,8 +369,9 @@ class Conic:
         # pencil of conics
         C = la * A + B
 
-        assert np.isclose(np.linalg.det(
-            C), 0), 'determinant of degenerate conic must be zero'
+        assert np.isclose(
+            np.linalg.det(C), 0
+        ), 'determinant of degenerate conic must be zero'
 
         # Decompose the degenerate conic
         BB = adjugate(C)
@@ -570,8 +583,7 @@ class Conic:
             The shifted conic.
         """
         t = np.reshape(t, (2, 1))
-        M = np.block([[np.eye(2), -t],
-                      [0, 0, 1]])
+        M = np.block([[np.eye(2), -t], [0, 0, 1]])
         return self.transform(M, invert=False)
 
     def scale(self, sx, sy=None):
@@ -612,8 +624,7 @@ class Conic:
         conics.Conic
             The rotated conic section.
         """
-        M = np.block([[rot2d(-angle), np.zeros((2, 1))],
-                      [0, 0, 1]])
+        M = np.block([[rot2d(-angle), np.zeros((2, 1))], [0, 0, 1]])
         return self.transform(M, invert=False)
 
     def normalize(self, d=-1):
@@ -707,7 +718,7 @@ class Conic:
         C = c**2
         D = -x * s**2 + y * s * c - p * c
         E = x * s * c - y * c**2 - p * s
-        F = (x * s - y * c)**2 + 2 * p * (x * c + y * s)
+        F = (x * s - y * c) ** 2 + 2 * p * (x * c + y * s)
 
         return Conic(np.array([A, B, C, D, E, F]) * Conic.__factors())
 
@@ -730,9 +741,15 @@ class Conic:
         ab = np.hypot(A, B)
         p = -(A * E - B * D) / ((A + C) * ab)
 
-        X = np.array([[A, B],
-                      [(A * D + 2 * C * D - B * E) / (A + C),
-                       (C * E + 2 * A * E - B * D) / (A + C)]])
+        X = np.array(
+            [
+                [A, B],
+                [
+                    (A * D + 2 * C * D - B * E) / (A + C),
+                    (C * E + 2 * A * E - B * D) / (A + C),
+                ],
+            ]
+        )
         b = -np.array([(A * D + B * E) / (A + C), F])
         vertex = np.linalg.solve(X, b)
 
@@ -805,7 +822,8 @@ class Conic:
 
         if type != 'parabola':
             raise ValueError(
-                'constraining conic to anything else than a parabola is not supported yet')
+                'constraining conic to anything else than a parabola is not supported yet'
+            )
 
         return self.__constrain_parabola(pts, fix_angle)
 
@@ -830,8 +848,10 @@ class Conic:
             x, y = pts
             A, B, C, D, E, F = a  # / Conic.__factors()
 
-            f = np.column_stack(
-                (x**2, 2 * x * y, y**2, 2 * x, 2 * y, np.ones_like(x))) * a[np.newaxis, ...]
+            f = (
+                np.column_stack((x**2, 2 * x * y, y**2, 2 * x, 2 * y, np.ones_like(x)))
+                * a[np.newaxis, ...]
+            )
             f7 = np.sum(f, axis=1)
 
             residuals = np.stack((*f7, w8 * (B**2 - A * C), w9 * (A + C - 1)))
@@ -839,7 +859,8 @@ class Conic:
             if fix_angle:
                 t = np.hypot(A, B)
                 residuals = np.stack(
-                    (*residuals, w10 * (A - c1 * t), w10 * (B + c2 * t)))
+                    (*residuals, w10 * (A - c1 * t), w10 * (B + c2 * t))
+                )
 
             return residuals
 
@@ -848,27 +869,24 @@ class Conic:
             A, B, C, D, E, F = a  # / Conic.__factors()
 
             top = np.column_stack(
-                (x**2, 2 * x * y, y**2, 2 * x, 2 * y, np.ones_like(x)))
-            bl = np.array([
-                [-w8 * C, 2 * w8 * B, -w8 * A],
-                [w9, 0, w9]])
+                (x**2, 2 * x * y, y**2, 2 * x, 2 * y, np.ones_like(x))
+            )
+            bl = np.array([[-w8 * C, 2 * w8 * B, -w8 * A], [w9, 0, w9]])
             br = np.zeros_like(bl)
 
-            J = np.block([[top],
-                          [bl, br]])
+            J = np.block([[top], [bl, br]])
 
             if fix_angle:
-                bl = np.array([
-                    [w10 * c2**2, w10 * c1 * c2, 0],
-                    [w10 * c1 * c2, w10 * c1**2, 0]])
+                bl = np.array(
+                    [[w10 * c2**2, w10 * c1 * c2, 0], [w10 * c1 * c2, w10 * c1**2, 0]]
+                )
                 br = np.zeros_like(bl)
 
-                J = np.block([[J],
-                              [bl, br]])
+                J = np.block([[J], [bl, br]])
 
             return J
 
-        r = least_squares(fun, x0, args=(pts, ), jac=jac)
+        r = least_squares(fun, x0, args=(pts,), jac=jac)
 
         coeffs = r.x * Conic.__factors()
 
@@ -888,7 +906,7 @@ if False:
     # icp(A1, A2)
 
 if False:
-    c = Conic(1, 2, 3, 4, 5, 6.)
+    c = Conic(1, 2, 3, 4, 5, 6.0)
 
     C1 = np.array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0])
     C2 = np.array([0.0, 0.0, -1.0, -1.0, 0.0, 1.0])

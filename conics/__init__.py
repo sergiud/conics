@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -25,11 +24,12 @@ from ._conic import surface_normal
 from ._ellipse import Ellipse
 from ._parabola import Parabola
 
-__all__ = ('concentric_conics_vanishing_line',
-           'Conic',
-           'estimate_pose',
-           'projected_center',
-           'surface_normal',
-           'Ellipse',
-           'Parabola',
-           )
+__all__ = (
+    'concentric_conics_vanishing_line',
+    'Conic',
+    'estimate_pose',
+    'projected_center',
+    'surface_normal',
+    'Ellipse',
+    'Parabola',
+)

@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -99,8 +98,7 @@ class Parabola:
             other = np.stack((xi, np.copysign(y2s, yi)))
             x0 = np.where(mask, np.zeros_like(xiyi), other)
 
-            r = least_squares(
-                fun, x0, args=(xi, yi), jac=jac, **kwargs)
+            r = least_squares(fun, x0, args=(xi, yi), jac=jac, **kwargs)
             # TODO check convergence
 
             pts2[:, i] = r.x
@@ -158,11 +156,18 @@ class Parabola:
             zeros = np.zeros_like(x)
 
             Q = np.array([[-p * ones, y], [-y, xi - x - p]])
-            J2 = np.array([[zeros, zeros, x, zeros],
-                           [y * c - p * s, y * s + p * c, y - yi, -y * yi + p * xi]])
+            J2 = np.array(
+                [
+                    [zeros, zeros, x, zeros],
+                    [y * c - p * s, y * s + p * c, y - yi, -y * yi + p * xi],
+                ]
+            )
             J3 = np.array(
-                [[ones, zeros, zeros, -x * s - y * c],
-                 [zeros, ones, zeros, +x * c - y * s]])
+                [
+                    [ones, zeros, zeros, -x * s - y * c],
+                    [zeros, ones, zeros, +x * c - y * s],
+                ]
+            )
 
             Q = np.moveaxis(Q, -1, 0)
             J2 = np.moveaxis(J2, -1, 0)
@@ -174,8 +179,7 @@ class Parabola:
 
         x0 = np.stack((*self.vertex, self.p, self.alpha))
 
-        r = least_squares(
-            fun, x0, args=(pts, ), jac=jac, **kwargs)
+        r = least_squares(fun, x0, args=(pts,), jac=jac, **kwargs)
 
         return Parabola(r.x[:2], r.x[2], r.x[3])
 

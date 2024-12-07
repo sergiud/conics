@@ -1,4 +1,3 @@
-
 # conics - Python library for dealing with conics
 #
 # Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
@@ -105,7 +104,8 @@ def parabola_to_bezier(parabola, start, end):
 
     if np.isclose(inter[-1], 0):
         raise ValueError(
-            'cannot construct a quadratic Bézier curve from the conic because the slopes at the contact points do not intersect')
+            'cannot construct a quadratic Bézier curve from the conic because the slopes at the contact points do not intersect'
+        )
 
     inter = hnormalized(inter)
 

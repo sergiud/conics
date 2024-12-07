@@ -54,8 +54,7 @@ def test_parabola1():
 
     np.testing.assert_approx_equal(p2.p, 0.38164, significant=5)
     np.testing.assert_approx_equal(p2.alpha, 0.08523, significant=5)
-    np.testing.assert_array_almost_equal(p2.vertex, [-6.73135, -1.30266],
-                                         decimal=3)
+    np.testing.assert_array_almost_equal(p2.vertex, [-6.73135, -1.30266], decimal=3)
 
 
 def test_parabola_conversion1():

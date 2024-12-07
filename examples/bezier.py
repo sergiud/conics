@@ -1,7 +1,6 @@
-
 # conics - Python library for dealing with conics
 #
-# Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,8 +32,10 @@ pb = Parabola.from_conic(C)
 control_points = parabola_to_bezier(pb, *pts[:, [0, -3]].T)
 s1, inter, s2 = control_points.T
 
-X, Y = np.meshgrid(np.linspace(np.min(x) - 1, np.max(x) + 1),
-                   np.linspace(-1 + np.min(y), np.max(y) + 1))
+X, Y = np.meshgrid(
+    np.linspace(np.min(x) - 1, np.max(x) + 1),
+    np.linspace(-1 + np.min(y), np.max(y) + 1),
+)
 Z = C([X, Y])
 
 fig = plt.figure()
@@ -43,14 +44,12 @@ plt.contour(X, Y, Z, levels=0)
 
 plt.scatter(*pts, label='observations')
 
-path = mpatches.Path(control_points.T, [mpatches.Path.MOVETO,
-                                        mpatches.Path.CURVE3, mpatches.Path.CURVE3])
+path = mpatches.Path(
+    control_points.T, [mpatches.Path.MOVETO, mpatches.Path.CURVE3, mpatches.Path.CURVE3]
+)
 pp = mpatches.PathPatch(
-    path,
-    fill=False,
-    linestyle='--',
-    edgecolor='blue',
-    lw=3, label='Bezier curve')
+    path, fill=False, linestyle='--', edgecolor='blue', lw=3, label='Bezier curve'
+)
 
 plt.gca().add_patch(pp)
 
