@@ -150,8 +150,8 @@ def projected_center(Q, n):
 
 
 def estimate_pose(Q, r, alpha):
-    r"""Estimates the 5-D camera pose with respect to the supporting plane of a
-    circle projection :cite:`Chen2004`.
+    r"""Estimates the 5 :term:`DoF` camera pose with respect to the supporting
+    plane of a circle projection :cite:`Chen2004`.
 
     Parameters
     ----------

@@ -13,7 +13,7 @@ Conics is a library for managing conic sections (or simply *conics*).
 * Conics construction and transformation
 * Algebraic and geometric fitting and conditioning
 * Computing intersections of conics
-* 5-D pose estimation of the supporting plane of an ellipse
+* 5 DoF pose estimation of the supporting plane of an ellipse
 
 ## License
 

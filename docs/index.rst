@@ -9,7 +9,7 @@ Features
 * Conics construction and transformation
 * Algebraic and geometric fitting and conditioning
 * Computing intersections of conics
-* 5-D pose estimation of the supporting plane of an ellipse
+* 5 :term:`DoF` pose estimation of the supporting plane of an ellipse
 
 .. toctree::
    :maxdepth: 4
@@ -18,6 +18,7 @@ Features
    readme
    usage
    bibliography
+   glossary
    license
 
 Indices and tables
