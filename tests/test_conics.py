@@ -282,9 +282,9 @@ def test_single_circle_intersection():
     hinter = hnormalized(inter)
     hinter = np.unique(hinter, axis=1)
 
-    assert np.size(hinter, axis=-1) == 2
+    assert np.size(hinter, axis=-1) == 1
 
-    np.testing.assert_array_almost_equal(hinter, [[1, 1], [0, 0]])
+    np.testing.assert_array_almost_equal(hinter, [[1], [0]])
 
     c = c1 - c2
 
@@ -298,7 +298,7 @@ def test_ellipse_four_intersections():
 
     inter = hnormalized(e1.intersect(e2))
 
-    assert np.size(inter, axis=-1) == 12
+    assert np.size(inter, axis=-1) == 4
 
     np.testing.assert_array_almost_equal(e1(inter), 0)
     np.testing.assert_array_almost_equal(e2(inter), 0)

@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from .geometry import projectively_unique
 from .geometry import rot2d
 from scipy.optimize import least_squares
 import itertools
@@ -320,7 +321,7 @@ class Conic:
 
         return np.array([[A, B, D], [B, C, E], [D, E, F]])
 
-    def intersect(self, other):
+    def intersect(self, other, atol: float = 1e-4) -> np.ndarray:
         r"""Computes the intersections of `self` with another conic.
 
         The method implements the algorithm introduced in
@@ -330,6 +331,9 @@ class Conic:
         ----------
         other : Conic
             The conic for which the intersections are to be computed.
+        atol : float, optional
+            The absolute tolerance to consider an intersection a duplicate of
+            another one.
 
         Returns
         -------
@@ -360,9 +364,9 @@ class Conic:
 
         # Use points that consists of real values only
         mask = ~np.any(~np.isclose(np.imag(PP), 0), axis=0)
-        PP = np.unique(PP[..., mask], axis=1)
+        PP = PP[..., mask]
 
-        return np.real(PP)
+        return projectively_unique(np.real(PP))
 
     def __intersect(la, A, B):
         # Set mu arbitrarily to 1 and compute the degenerate conic using the
@@ -406,13 +410,7 @@ class Conic:
         P1 = Conic.__intersect_line(A, g)
         P2 = Conic.__intersect_line(A, h)
 
-        if P1.shape == P2.shape and np.all(np.isclose(P1, P2)):
-            P = P1
-        else:
-            P = np.column_stack((P1, P2))
-
-        nonzero = ~np.isclose(P[-1, :], 0)
-        return P[:, nonzero]
+        return np.column_stack((P1, P2))
 
     def __intersect_line(A, g):
         l, u, t = g
@@ -437,9 +435,6 @@ class Conic:
 
         P1 = C[i, :]
         P2 = C[:, j]
-
-        if np.all(np.isclose(P1, P2)):
-            return P1
 
         return np.column_stack((P1, P2))
 
