@@ -46,11 +46,11 @@ Z_refined = C_refined([X, Y])
 plt.figure()
 plt.axis('equal')
 
-cs = plt.contour(X, Y, Z, levels=0)
-cs.collections[1].set_label('fitted parabola')
+cs = plt.contour(X, Y, Z, colors='blue', levels=[0])
+artists1, _ = cs.legend_elements()
 
-cs_refined = plt.contour(X, Y, Z_refined, colors='red', levels=0)
-cs_refined.collections[1].set_label('refined parabola')
+cs_refined = plt.contour(X, Y, Z_refined, colors='red', levels=[0])
+artists2, _ = cs_refined.legend_elements()
 
 plt.scatter(x, y, label='observations')
 
@@ -59,5 +59,7 @@ for xy in np.dstack((contact_pts.T, pts.T)):
 
 plt.scatter(*contact_pts, label='orthogonal contact points')
 
-plt.legend()
+a, l = plt.gca().get_legend_handles_labels()
+
+plt.legend(artists1 + artists2 + a, ['fitted parabola', 'refined parabola'] + l)
 plt.show()
