@@ -44,7 +44,7 @@ import conics.__about__
 
 # General information about the project.
 project = 'conics'
-copyright = '2024, Sergiu Deitsch'
+copyright = '2025, Sergiu Deitsch'
 author = 'Sergiu Deitsch'
 
 # The version info for the project you're documenting, acts as replacement
