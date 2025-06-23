@@ -350,7 +350,7 @@ class Conic:
         gamma = bracket(A, B, B) + bracket(B, A, B) + bracket(B, B, A)
         delta = np.linalg.det(B)
 
-        poly = np.array([alpha, beta, gamma, delta])
+        poly = np.array([alpha, beta, gamma, delta], dtype=complex)
         La = np.roots(poly)
         PP = np.empty_like(poly, shape=(3, 0))
 
@@ -386,9 +386,6 @@ class Conic:
 
         # NOTE There's a typo in the book; a minus in the sqrt term is missing.
         bb2 = -BB[i, i]
-
-        if bb2 < 0:
-            bb2 = np.complex128(bb2)
 
         bb = np.sqrt(bb2)
 
@@ -428,9 +425,6 @@ class Conic:
         B = np.einsum('ji,jk,kl->il', M_l, A, M_l)
 
         D = -np.linalg.det(B[:2, :2])
-
-        if D < 0:
-            D = np.complex128(D)
 
         aa = np.sqrt(D) / t
         C = B + aa * M_l

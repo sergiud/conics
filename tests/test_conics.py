@@ -282,14 +282,26 @@ def test_single_circle_intersection():
     hinter = hnormalized(inter)
     hinter = np.unique(hinter, axis=1)
 
-    assert hinter.shape[1] == 1
+    assert np.size(hinter, axis=-1) == 2
 
-    np.testing.assert_array_almost_equal(hinter, [[1], [0]])
+    np.testing.assert_array_almost_equal(hinter, [[1, 1], [0, 0]])
 
     c = c1 - c2
 
     np.testing.assert_array_almost_equal(c(inter), 0)
     np.testing.assert_array_almost_equal(c(hinter), 0)
+
+
+def test_ellipse_four_intersections():
+    e1 = Conic.from_ellipse([0, 0], [2, 1], 0)
+    e2 = Conic.from_ellipse([1, 1], [2, 1], np.pi / 2)
+
+    inter = hnormalized(e1.intersect(e2))
+
+    assert np.size(inter, axis=-1) == 12
+
+    np.testing.assert_array_almost_equal(e1(inter), 0)
+    np.testing.assert_array_almost_equal(e2(inter), 0)
 
 
 def test_conic_from_homogeneous_non_symmetric():
