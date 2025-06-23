@@ -255,7 +255,7 @@ class Conic:
 
     Parameters
     ----------
-    args : array-like, optional
+    args : array_like, optional
         Coeffcients of the quadratic curve.
     """
 
@@ -458,9 +458,9 @@ class Conic:
 
         Parameters
         ----------
-        x0 : array-like
+        x0 : array_like
             The 2-D center of the ellipse.
-        major_minor : array-like
+        major_minor : array_like
             The size of the half axes.
         angle : float
             The orientation of the ellipse in radians.
@@ -478,7 +478,7 @@ class Conic:
 
         Parameters
         ----------
-        x0 : array-like
+        x0 : array_like
             The 2-D center of the circle.
         r : float
             The circle radius.
@@ -573,7 +573,7 @@ class Conic:
 
         Parameters
         ----------
-        t : array-like
+        t : array_like
             2-D translation vector by which the points on the conic are
             shifted.
 

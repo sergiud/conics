@@ -2,7 +2,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -135,4 +135,11 @@ html_theme_options = {
 mathjax3_config = {
     'loader': {'load': ['[tex]/mathtools']},
     'tex': {'packages': {'[+]': ['mathtools']}},
+}
+
+nitpicky = True
+
+nitpick_ignore = {
+    ('py:class', 'array_like'),
+    ('py:class', 'optional'),
 }
