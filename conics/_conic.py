@@ -63,7 +63,7 @@ def concentric_conics_vanishing_line(C1, C2):
 def g2a(x0, major_minor, alpha):
     if np.less(*major_minor):
         warnings.warn(
-            'ellipse major axis size must be larger or equal to the minor one. however, the provided major axis is smaller than the minor axis. this may cause an unintentional change of ellipise orientation',
+            'ellipse major axis size must be larger or equal to the minor one. however, the provided major axis is smaller than the minor axis. this may cause an unintentional change of ellipse orientation',
             UserWarning,
         )
 
@@ -252,12 +252,12 @@ def estimate_pose(Q, r, alpha):
 
 
 class Conic:
-    """Initializes the conic using the given coefficents.
+    """Initializes the conic using the given coefficients.
 
     Parameters
     ----------
     args : array_like, optional
-        Coeffcients of the quadratic curve.
+        Coefficients of the quadratic curve.
     """
 
     def __init__(self, *args):
@@ -403,7 +403,7 @@ class Conic:
         if CC[i, j] == 0:
             return np.empty_like(CC, shape=(3, 0))
 
-        # Lines consituting the degenerate conic
+        # Lines constituting the degenerate conic
         g = CC[i, :]
         h = CC[:, j]
 
