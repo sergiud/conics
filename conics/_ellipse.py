@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,12 +39,39 @@ def _jac_contact_point(a, b, x, y, xi, yi):
 
 
 class Ellipse:
+    """Initializes the ellipse using its geometric representation.
+
+    Parameters
+    ==========
+    center: array_like
+        The center of the ellipse.
+    major_minor: array_like
+        The size of the semi-major and semi-minor axes.
+    alpha: float
+        The orientation angle in radians.
+    """
     def __init__(self, center, major_minor, alpha):
         self.center = np.ravel(center)
         self.major_minor = np.ravel(major_minor)
         self.alpha = alpha
 
     def contact(self, pts):
+        """Computes the orthogonal points on the ellipse given some 2-D points.
+
+        Orthogonal (contact) points are points closest to the ones passed to the
+        method.
+
+        Parameters
+        ==========
+        pts: array_like
+            The 2-D points whose closeses (orthogonal) points on the ellipse
+            should be determined.
+
+        Returns
+        =======
+        contact_pts: numpy.ndarray
+            The orthogonal points on the ellipse.
+        """
         pts = np.atleast_2d(pts)
 
         R = rot2d(self.alpha)
@@ -87,6 +114,8 @@ class Ellipse:
         return R @ x + center
 
     def refine(self, pts):
+        """Refine the ellipse non-linearly.
+        """
         pts = np.atleast_2d(pts)
 
         def fun(aa, pts):
@@ -151,8 +180,13 @@ class Ellipse:
 
     @staticmethod
     def from_conic(C):
+        """Constructs an ellipse from the specified conic.
+        """
         center, major_minor, alpha = C.to_ellipse()
         return Ellipse(center, major_minor, alpha)
 
     def to_conic(self):
+        """Constructs a :class:`Conic` from the current :class:`Ellipse`
+        instance.
+        """
         return Conic.from_ellipse(self.center, self.major_minor, self.alpha)
