@@ -145,5 +145,6 @@ nitpick_ignore = {
 }
 
 nitpick_ignore_regex = {
+    ('py:class', r'[a-z]([+-]\d+)?'),
     ('py:class', r'\d+'),
 }
