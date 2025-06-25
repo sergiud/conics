@@ -14,6 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Conic-line intersections
+========================
+
+asdfasdf
+"""
+
 from conics import Conic
 from conics.geometry import hnormalized
 from matplotlib.patches import Ellipse
@@ -68,7 +75,7 @@ ax2.add_patch(as_ellipse(c3, facecolor='none', edgecolor='red'))
 ax2.add_patch(as_ellipse(c4, facecolor='none', edgecolor='blue'))
 ax2.contour(X, Y, Z_l, levels=[0])
 ax2.scatter(*inter21)
-#ax2.scatter(*inter22.T)
+# ax2.scatter(*inter22.T)
 
 ax3.set_title('Ellipses-line')
 ax3.add_patch(as_ellipse(e1, facecolor='none', edgecolor='red'))
@@ -81,4 +88,3 @@ ax1.axis('equal')
 ax2.axis('equal')
 
 plt.show()
-

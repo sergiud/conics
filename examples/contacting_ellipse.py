@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""
+Foobar
+======
+
+asdfasdf
+"""
 
 from conics import Ellipse
 from conics.fitting import fit_dlt
@@ -41,7 +48,7 @@ ee = mpatches.Ellipse(
     e.center,
     width,
     height,
-    np.rad2deg(e.alpha),
+    angle=np.rad2deg(e.alpha),
     edgecolor='red',
     facecolor='none',
     lw=2,
@@ -52,7 +59,7 @@ ee1 = mpatches.Ellipse(
     e1.center,
     width1,
     height1,
-    np.rad2deg(e1.alpha),
+    angle=np.rad2deg(e1.alpha),
     edgecolor='blue',
     facecolor='none',
     lw=2,

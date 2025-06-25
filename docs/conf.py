@@ -75,6 +75,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
+    'sphinx_gallery.gen_gallery',
     'sphinxcontrib.bibtex',
 ]
 
@@ -146,4 +147,10 @@ nitpick_ignore = {
 
 nitpick_ignore_regex = {
     ('py:class', r'\d+'),
+}
+
+sphinx_gallery_conf = {
+    'examples_dirs': '../examples',
+    'filename_pattern': '/',
+    'gallery_dirs': 'generated_examples',
 }

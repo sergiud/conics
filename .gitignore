@@ -4,5 +4,7 @@
 /.env/
 /dist/
 /docs/_build/
+/docs/generated_examples/
 /docs/references.bib.blg
+/docs/sg_execution_times.rst
 __pycache__/
