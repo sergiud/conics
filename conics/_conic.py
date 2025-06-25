@@ -566,7 +566,7 @@ class Conic:
             \tilde{C}' = (H\vec p)^\top \tilde{C}(H\vec p)
                        = \vec p^\top (H^\top \tilde{C} H) \vec p
 
-        See :cite:`Hartley2004` for details.
+        See :cite:t:`Hartley2004` for details.
 
         Parameters
         ----------
@@ -660,8 +660,8 @@ class Conic:
         r"""Normalizes the conic coefficients such that the determinant of the
         homogeneous symmetric matrix obtains the specified value `d`, i.e.,
         :math:`\det Q = d` where :math:`Q\in\mathbb{R}^{3\times3}` is the conic
-        in the matrix form. The normalization scheme was proposed in
-        :cite:`Kanatani1993`.
+        in the matrix form. The normalization scheme was proposed by
+        :cite:t:`Kanatani1993`.
 
         To obtain a specific determinant value, one can exploit the determinant
         property :math:`\det(kC) = k^n \det C` where :math:`n` is the size of
@@ -716,7 +716,7 @@ class Conic:
         R"""Constructs a conic section from the geometric representation of a
         parabola.
 
-        The conversion uses the method from :cite:`Ahn2001`.
+        The conversion uses the method by :cite:t:`Ahn2001`.
 
         Parameters
         ----------
