@@ -143,3 +143,7 @@ nitpick_ignore = {
     ('py:class', 'array_like'),
     ('py:class', 'optional'),
 }
+
+nitpick_ignore_regex = {
+    ('py:class', r'\d+'),
+}

@@ -1,7 +1,7 @@
 #
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -372,3 +372,59 @@ def test_evaluate_homogeneous_ndim():
 
     values = c(pts)
     np.testing.assert_array_equal(values, 3)
+
+
+@pytest.mark.parametrize('alpha', np.deg2rad([0, 45, 90, 135, 180]))
+def test_circle_line_two_intersections(alpha):
+    c = Conic.from_circle([0, 0], 1)
+
+    n = np.array([np.cos(alpha), np.sin(alpha)])
+    d = 0
+
+    l = np.append(n, d)
+
+    inter = hnormalized(c.intersect_line(l))
+
+    assert inter.shape == (2, 2)
+
+    np.testing.assert_array_almost_equal(c(inter), 0)
+
+
+@pytest.mark.parametrize('d', [-1, 1])
+def test_circle_line_single_intersection(d):
+    c = Conic.from_circle([0, 0], 1)
+
+    n = np.array([-d, 0])
+    l = np.append(n, d)
+
+    inter = hnormalized(c.intersect_line(l))
+
+    assert inter.shape == (2, 1)
+
+    np.testing.assert_array_almost_equal(c(inter), 0)
+
+
+@pytest.mark.parametrize('d', [-2, 2])
+def test_circle_line_no_intersection(d):
+    c = Conic.from_circle([0, 0], 1)
+
+    n = np.array([np.copysign(1, -d), 0])
+    l = np.append(n, d)
+
+    inter = c.intersect_line(l)
+
+    assert inter.shape == (3, 0)
+
+    np.testing.assert_array_almost_equal(c(inter), 0)
+
+
+def test_circle_infinite_line_intersection():
+    c = Conic.from_circle([0, 0], 1)
+
+    l = np.zeros((3,))
+
+    inter = c.intersect_line(l)
+
+    assert inter.shape == (3, 0)
+
+    np.testing.assert_array_almost_equal(c(inter), 0)

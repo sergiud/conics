@@ -19,6 +19,7 @@ from .geometry import rot2d
 from scipy.optimize import least_squares
 import itertools
 import numpy as np
+import numpy.typing as npt
 import scipy.linalg
 import warnings
 
@@ -397,7 +398,7 @@ class Conic:
         M_p = skew_symmetric(p)
         CC = C + M_p
 
-        i, j = np.unravel_index(np.argmax(CC**2), CC.shape)
+        i, j = np.unravel_index(np.argmax(np.abs(CC)), CC.shape)
 
         if CC[i, j] == 0:
             return np.empty_like(CC, shape=(3, 0))
@@ -411,26 +412,31 @@ class Conic:
 
         return np.column_stack((P1, P2))
 
-    def __intersect_line(A, g):
-        l, u, t = g
+    @staticmethod
+    def __intersect_line(A, l):
+        if np.all(np.equal(l, 0)):
+            return np.empty_like(A, shape=(3, 0))
 
-        if t == 0:
-            return np.empty_like(t, shape=(3, 0))
+        A = np.asarray(A, dtype=complex)
 
-        M_l = skew_symmetric(g)
+        M_l = skew_symmetric(l)
         # B = np.linalg.multi_dot([M_l.T, A, M_l])
+        # M_l.T @ A @ M_l
         B = np.einsum('ji,jk,kl->il', M_l, A, M_l)
 
-        D = -np.linalg.det(B[:2, :2])
+        for i in range(3):
+            if l[i] == 0:
+                continue
 
-        aa = np.sqrt(D) / t
-        C = B + aa * M_l
+            # If the corresponding coefficient is zero take a different 2x2
+            # (minor) matrix
+            D = np.linalg.det(np.delete(np.delete(B, i, axis=0), i, axis=1))
+            t = l[i]
+            break
 
-        l2_r = np.linalg.norm(C, axis=1)
-        l2_c = np.linalg.norm(C, axis=0)
-
-        i = np.argmax(l2_r)
-        j = np.argmax(l2_c)
+        alpha = np.sqrt(-D) / t
+        C = B + alpha * M_l
+        i, j = np.unravel_index(np.argmax(np.abs(C)), C.shape)
 
         P1 = C[i, :]
         P2 = C[:, j]
@@ -439,6 +445,33 @@ class Conic:
 
     def __factors():
         return np.array([1, 2, 1, 2, 2, 1])
+
+    def intersect_line(self, l: npt.ArrayLike) -> np.ndarray:
+        r"""Computes the intersections of `self` with a homogeneous line.
+
+        A line in homogeneous coordinates is given by :math:`\vec l = (\vec
+        n^\top, d)^\top \in \mathbb{R}^3` where :math:`\vec n` is the normal to
+        the line and :math:`d` its distance to the origin.
+
+        Parameters
+        ----------
+        l : array_like (3, )
+            The homogeneous line to intersect the conic with.
+
+        Returns
+        -------
+        numpy.ndarray
+            A matrix of homogeneous 2-D points stored in column vectors
+            of a :math:`3\times N` matrix consisting of :math:`0\leq
+            N\leq 2` columns.
+
+
+        .. plot:: ../examples/line_intersections.py
+        """
+
+        inter = Conic.__intersect_line(self.homogeneous, l)
+        mask = np.all(np.isclose(np.imag(inter), 0), axis=0)
+        return projectively_unique(np.real(inter[..., mask]))
 
     @staticmethod
     def from_ellipse(x0, major_minor, alpha):
