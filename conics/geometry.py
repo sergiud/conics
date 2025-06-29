@@ -18,64 +18,48 @@ import numpy as np
 import numpy.typing as npt
 
 
-def hnormalized(p):
+def hnormalized(p: npt.NDArray[np.floating]) -> npt.NDArray[np.floating]:
     return p[:-1] / p[-1]
 
 
-def homogeneous(p):
+def homogeneous(p: npt.ArrayLike) -> npt.NDArray[np.floating]:
     p = np.atleast_2d(p).T
     return np.vstack((p, np.ones_like(p[0])))
 
 
-def line_through(a, b):
-    start = np.stack((*np.ravel(a), 1))
-    end = np.stack((*np.ravel(b), 1))
+def line_through(a: npt.ArrayLike, b: npt.ArrayLike) -> npt.NDArray[np.floating]:
+    start = np.append(a, 1)
+    end = np.append(b, 1)
 
     return np.cross(start, end)
 
 
-def line_intersection(l1, l2):
+def line_intersection(l1: npt.ArrayLike, l2: npt.ArrayLike) -> npt.NDArray[np.floating]:
     return np.cross(l1, l2)
 
 
-def rot2d(alpha):
+def rot2d(alpha: float) -> npt.NDArray[np.float64]:
     c = np.cos(alpha)
     s = np.sin(alpha)
     return np.array([[c, -s], [s, c]])
 
 
 def projectively_unique(p: npt.ArrayLike, atol: float = 1e-4) -> np.ndarray:
-    n = np.size(p, axis=-1)
+    p = np.asarray(p)
+    n = p.shape[-1]
+    # The indices of the strictly upper-triangular part of the adjacency
+    # matrix
+    i, j = np.triu_indices(n, k=1)
 
     # Pairwise cross-product between each intersection for filtering out
     # multiplicative multiples
-    c = np.empty_like(p, shape=(n, n, 3))
-
-    for i in np.arange(n):
-        for j in np.arange(n):
-            c[i, j] = np.cross(np.take(p, i, axis=-1), np.take(p, j, axis=-1))
+    c = np.cross(p.T[i], p.T[j])
 
     # Compute the norm of the cross-products which is zero for a pair of
     # intersections that are equivalent up to scale
     d = np.linalg.norm(c, axis=-1)
     m = np.isclose(d, 0, atol=atol)
-    # The indices of the strictly upper-triangular part of the adjacency
-    # matrix
-    i, j = np.triu_indices(n, k=1)
 
-    duplicate = np.zeros(n, dtype=bool)
-
-    for k in np.arange(n):
-        if duplicate[k]:
-            continue
-
-        # Current row of the strictly upper-triangular matrix
-        r = m[k][j[k == i]]
-        # Determine duplicate intersections by evaluating the norm of the
-        # pairwise cross-product with respect to the current intersection
-        l = np.nonzero(r)
-        # Mark other intersections as duplicates to avoid repeated
-        # processing. Account for the offset of the diagonal element.
-        duplicate[k + l + 1] = True
-
-    return np.take(p, np.nonzero(~duplicate)[0], axis=-1)
+    # mark points as duplicate if cross product with an earlier point has 0 norm
+    duplicate = np.bincount(j, m) > 0
+    return p[:, ~duplicate]
