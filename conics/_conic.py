@@ -356,11 +356,8 @@ class Conic:
 
         poly = np.array([alpha, beta, gamma, delta], dtype=complex)
         La = np.roots(poly)
-        PP = np.empty_like(poly, shape=(3, 0))
 
-        for la in La:
-            P = Conic.__intersect(la, A, B)
-            PP = np.column_stack((PP, P))
+        PP = np.column_stack([Conic.__intersect(la, A, B) for la in La])
 
         # Use points that consists of real values only
         mask = ~np.any(~np.isclose(np.imag(PP), 0), axis=0)
