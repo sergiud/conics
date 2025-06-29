@@ -608,7 +608,7 @@ class Conic:
         return Conic(np.multiply(coeffs, Conic.__factors()))
 
     def transform(
-        self, R: np.ndarray, L: np.ndarray | None = None, invert: bool = True
+        self, R: np.ndarray, L: np.ndarray | None = None, *, invert: bool = True
     ) -> Conic:
         r"""Transforms the conic using a homography :math:`H\in\mathbb{R}^{3\times3}` as
 
