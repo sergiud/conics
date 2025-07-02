@@ -13,6 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import annotations
+
+from collections.abc import Sequence
+from typing import Literal
 
 from .geometry import projectively_unique
 from .geometry import rot2d
@@ -24,13 +28,13 @@ import scipy.linalg
 import warnings
 
 
-def _make_circle(x0, r):
+def _make_circle(x0: npt.ArrayLike, r: float) -> np.ndarray:
     x0 = np.reshape(x0, (2, 1))
     C = np.block([[np.eye(2), -x0], [-x0.T, x0.T @ x0 - r**2]])
     return C
 
 
-def icp(A1, A2):
+def icp(A1: np.ndarray, A2: np.ndarray) -> tuple[float, float]:
     e = scipy.linalg.eig(A1, A2, left=False, right=False)
     k = np.argmax(np.abs(np.median(e) - e))
     u, s, vt = np.linalg.svd(e[k] * np.linalg.inv(A1) - np.linalg.inv(A2))
@@ -48,7 +52,9 @@ def icp(A1, A2):
 # Camera Calibration
 
 
-def concentric_conics_vanishing_line(C1, C2):
+def concentric_conics_vanishing_line(
+    C1: np.ndarray, C2: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
     C = np.linalg.solve(C2, C1)
     evals, evecs = np.linalg.eig(C)
 
@@ -61,7 +67,7 @@ def concentric_conics_vanishing_line(C1, C2):
     return x1, v
 
 
-def g2a(x0, major_minor, alpha):
+def g2a(x0: npt.ArrayLike, major_minor: npt.ArrayLike, alpha: float) -> np.ndarray:
     if np.less(*major_minor):
         warnings.warn(
             'ellipse major axis size must be larger or equal to the minor one. however, the provided major axis is smaller than the minor axis. this may cause an unintentional change of ellipse orientation',
@@ -78,7 +84,9 @@ def g2a(x0, major_minor, alpha):
     return np.vstack((a, b, c, d, e, f))
 
 
-def a2g(x0, C33, f):
+def a2g(
+    x0: np.ndarray, C33: np.ndarray, f: float
+) -> tuple[np.ndarray, np.ndarray, float]:
     factor = x0.T @ C33 @ x0 - f
 
     evals, evecs = np.linalg.eigh(C33)
@@ -93,15 +101,19 @@ def a2g(x0, C33, f):
     return x0, major_minor, alpha
 
 
-def bracket(A, B, C):
+def bracket(A: np.ndarray, B: np.ndarray, C: np.ndarray) -> float:
     return np.linalg.det(np.stack((A[:, 0], B[:, 1], C[:, 2]), axis=1))
 
 
-def cofactor(A):
+def cofactor(A: np.ndarray) -> np.ndarray:
     n, m = A.shape
 
     C = np.empty_like(A)
 
+    # TODO should be able to achieve this by creating a stack of of indicies
+    # that correspond to the minors, e.g. an index array (I) of shape
+    # (n, n, n - 1, n-1). Then something equivalent to np.linalg.det(A[I]) will
+    # be the cofactor, but the details are a bit tricky
     for i in range(n):
         for j in range(m):
             minors = np.delete(np.delete(A, i, axis=0), j, axis=1)
@@ -110,7 +122,7 @@ def cofactor(A):
     return C
 
 
-def adjugate(C):
+def adjugate(C: npt.ArrayLike) -> np.ndarray:
     det = np.linalg.det(C)
 
     if det == 0:
@@ -119,12 +131,12 @@ def adjugate(C):
     return np.linalg.inv(C).T * det
 
 
-def skew_symmetric(C):
+def skew_symmetric(C: Sequence[float]) -> np.ndarray:
     a, b, c = C
     return np.array([[0, c, -b], [-c, 0, a], [b, -a, 0]])
 
 
-def surface_normal(Q, r=1):
+def surface_normal(Q: np.ndarray, r: float = 1) -> tuple[np.ndarray, float]:
     evals, evecs = np.linalg.eigh(Q)
     idxs = np.argsort(evals)[::-1]
 
@@ -145,14 +157,14 @@ def surface_normal(Q, r=1):
     return n, h
 
 
-def projected_center(Q, n):
+def projected_center(Q: np.ndarray, n: np.ndarray) -> np.ndarray:
     """Provides the projected center of the circle in the camera coordinate
     system.
     """
     return np.linalg.solve(Q, n)
 
 
-def estimate_pose(Q, r, alpha):
+def estimate_pose(Q: np.ndarray, r: float, alpha: float):
     r"""Estimates the 5 :term:`DoF` camera pose with respect to the supporting
     plane of a circle projection :cite:`Chen2004`.
 
@@ -261,25 +273,23 @@ class Conic:
         Coefficients of the quadratic curve.
     """
 
-    def __init__(self, *args):
+    def __init__(self, *args: float | np.ndarray) -> None:
         if not (
             len(args) == 0 or (len(args) == 1 and np.size(*args) == 6) or len(args) == 6
         ):
             raise ValueError(
-                'unexpected number of arguments; expected 0, 1 or 6 arguments but got {}'.format(
-                    len(args)
-                )
+                f'unexpected number of arguments; expected 0, 1 or 6 arguments but got {len(args)}'
             )
 
-        self.coeffs_ = np.ravel(args)
+        self.coeffs_: np.ndarray = np.ravel(args)
 
     @property
-    def __C33(self):
+    def __C33(self) -> np.ndarray:
         a, b, c, d, e, f = self.coeffs_
         half_b = b / 2
         return np.block([[a, half_b], [half_b, c]])
 
-    def __center(self, C33):
+    def __center(self, C33: np.ndarray) -> np.ndarray:
         d, e = self.coeffs_[-3:-1]
         return -np.linalg.solve(C33, np.vstack((d, e)) / 2)
 
@@ -295,7 +305,7 @@ class Conic:
         return self.__center(self.__C33)
 
     @property
-    def homogeneous(self):
+    def homogeneous(self) -> np.ndarray:
         r"""Returns the homogeneous :math:`3\times3` symmetric matrix
         that represents the conic section. The matrix is given by
 
@@ -322,7 +332,7 @@ class Conic:
 
         return np.array([[A, B, D], [B, C, E], [D, E, F]])
 
-    def intersect(self, other, atol: float = 1e-4) -> np.ndarray:
+    def intersect(self, other: Conic, atol: float = 1e-4) -> np.ndarray:
         r"""Computes the intersections of `self` with another conic.
 
         The method implements the algorithm introduced in
@@ -368,7 +378,8 @@ class Conic:
 
         return projectively_unique(np.real(PP))
 
-    def __intersect(la, A, B):
+    @staticmethod
+    def __intersect(la: float, A: np.ndarray, B: np.ndarray) -> np.ndarray:
         # Set mu arbitrarily to 1 and compute the degenerate conic using the
         # pencil of conics
         C = la * A + B
@@ -413,7 +424,7 @@ class Conic:
         return np.column_stack((P1, P2))
 
     @staticmethod
-    def __intersect_line(A, l):
+    def __intersect_line(A: np.ndarray, l: np.ndarray) -> np.ndarray:
         if np.all(np.equal(l, 0)):
             return np.empty_like(A, shape=(3, 0))
 
@@ -443,7 +454,8 @@ class Conic:
 
         return np.column_stack((P1, P2))
 
-    def __factors():
+    @staticmethod
+    def __factors() -> np.ndarray:
         return np.array([1, 2, 1, 2, 2, 1])
 
     def intersect_line(self, l: npt.ArrayLike) -> np.ndarray:
@@ -474,7 +486,9 @@ class Conic:
         return projectively_unique(np.real(inter[..., mask]))
 
     @staticmethod
-    def from_ellipse(x0, major_minor, alpha):
+    def from_ellipse(
+        x0: npt.ArrayLike, major_minor: npt.ArrayLike, alpha: float
+    ) -> Conic:
         """Constructs a conic section from ellipse parameters.
 
         Parameters
@@ -494,7 +508,7 @@ class Conic:
         return Conic(g2a(x0, major_minor, alpha))
 
     @staticmethod
-    def from_circle(x0, r):
+    def from_circle(x0: npt.ArrayLike, r: float) -> Conic:
         """Constructs a conic from geometric representation of a circle.
 
         Parameters
@@ -569,7 +583,7 @@ class Conic:
         return x0, r
 
     @staticmethod
-    def from_homogeneous(Q):
+    def from_homogeneous(Q: np.ndarray) -> Conic:
         r"""Constructs a conic section from its homogeneous :math:`3\times3`
         symmetric matrix representation.
 
@@ -590,7 +604,9 @@ class Conic:
         coeffs = [Q[0, 0], Q[0, 1], Q[1, 1], Q[0, 2], Q[1, 2], Q[2, 2]]
         return Conic(np.multiply(coeffs, Conic.__factors()))
 
-    def transform(self, R, L=None, invert=True):
+    def transform(
+        self, R: np.ndarray, L: np.ndarray | None = None, invert: bool = True
+    ) -> Conic:
         r"""Transforms the conic using a homography :math:`H\in\mathbb{R}^{3\times3}` as
 
         .. math::
@@ -629,7 +645,7 @@ class Conic:
         Q = L @ self.homogeneous @ R
         return Conic.from_homogeneous(Q)
 
-    def translate(self, t):
+    def translate(self, t: npt.ArrayLike) -> Conic:
         """Shifts the points on the conic by a 2-D translation vector `t`.
 
         Parameters
@@ -647,7 +663,7 @@ class Conic:
         M = np.block([[np.eye(2), -t], [0, 0, 1]])
         return self.transform(M, invert=False)
 
-    def scale(self, sx, sy=None):
+    def scale(self, sx: foat, sy: float | None = None) -> Conic:
         R"""Scales the conic coordinates.
 
         Parameters
@@ -671,7 +687,7 @@ class Conic:
 
         return self.transform(M, invert=False)
 
-    def rotate(self, angle):
+    def rotate(self, angle: float) -> Conic:
         """Rotates the `points` on the conic in the counter-clockwise
         direction.
 
@@ -688,7 +704,7 @@ class Conic:
         M = np.block([[rot2d(-angle), np.zeros((2, 1))], [0, 0, 1]])
         return self.transform(M, invert=False)
 
-    def normalize(self, d=-1):
+    def normalize(self, d: float = -1) -> Conic:
         r"""Normalizes the conic coefficients such that the determinant of the
         homogeneous symmetric matrix obtains the specified value `d`, i.e.,
         :math:`\det Q = d` where :math:`Q\in\mathbb{R}^{3\times3}` is the conic
@@ -721,16 +737,16 @@ class Conic:
         k = np.cbrt(d / np.linalg.det(C))
         return Conic.from_homogeneous(k * C)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return repr(self.coeffs_)
 
-    def __sub__(self, other):
+    def __sub__(self, other: Conic) -> Conic:
         return Conic(self.coeffs_ - other.coeffs_)
 
-    def __plus__(self, other):
+    def __plus__(self, other: Conic) -> Conic:
         return Conic(self.coeffs_ + other.coeffs_)
 
-    def __call__(self, pts):
+    def __call__(self, pts: npt.ArrayLike) -> np.ndarray:
         """Evaluates the conic on the points `pts`."""
 
         s = np.shape(pts)
@@ -744,7 +760,7 @@ class Conic:
         return np.einsum('ji...,jk...,ji...->i...', pts, self.homogeneous, pts)
 
     @staticmethod
-    def from_parabola(center, p, alpha):
+    def from_parabola(center: npt.ArrayLike, p: float, alpha: float) -> Conic:
         R"""Constructs a conic section from the geometric representation of a
         parabola.
 
@@ -783,7 +799,7 @@ class Conic:
 
         return Conic(np.array([A, B, C, D, E, F]) * Conic.__factors())
 
-    def to_parabola(self):
+    def to_parabola(self) -> tuple[np.ndarray, float, float]:
         R"""Returns the geometric representation of the parabola given by the
         current conic.
 
@@ -820,7 +836,7 @@ class Conic:
 
         return (vertex, p, alpha)
 
-    def gradient(self, pts):
+    def gradient(self, pts: npt.ArrayLike) -> np.ndarray:
         R"""Computes the conic first-order derivative with respect to its
         coordinates:
 
@@ -858,7 +874,12 @@ class Conic:
 
         return np.vstack((dx, dy))
 
-    def constrain(self, pts, type='parabola', fix_angle=False):
+    def constrain(
+        self,
+        pts: npt.ArrayLike,
+        type: Literal['parabola'] = 'parabola',
+        fix_angle: bool | float = False,
+    ) -> Conic:
         R"""Conditions the conic to a specific type and specific properties.
 
         Parameters
@@ -888,7 +909,14 @@ class Conic:
 
         return self.__constrain_parabola(pts, fix_angle)
 
-    def __constrain_parabola(self, pts, fix_angle=False, w8=1e6, w9=1e6, w10=1e6):
+    def __constrain_parabola(
+        self,
+        pts: np.ndarray,
+        fix_angle: bool | float = False,
+        w8: float = 1e6,
+        w9: float = 1e6,
+        w10: float = 1e6,
+    ):
         x0 = self.coeffs_ / Conic.__factors()
 
         if not isinstance(fix_angle, bool) or fix_angle:
@@ -905,7 +933,7 @@ class Conic:
 
             fix_angle = True
 
-        def fun(a, pts):
+        def fun(a: np.ndarray, pts: np.ndarray) -> np.ndarray:
             x, y = pts
             A, B, C, D, E, F = a  # / Conic.__factors()
 
@@ -925,7 +953,7 @@ class Conic:
 
             return residuals
 
-        def jac(a, pts):
+        def jac(a: np.ndarray, pts: np.ndarray) -> np.ndarray:
             x, y = pts
             A, B, C, D, E, F = a  # / Conic.__factors()
 
