@@ -117,7 +117,8 @@ def cofactor(A: np.ndarray) -> np.ndarray:
     for i in range(n):
         for j in range(m):
             minors = np.delete(np.delete(A, i, axis=0), j, axis=1)
-            C[i, j] = np.linalg.det(minors)
+            sign = 1 if (i + j) % 2 == 0 else -1
+            C[i, j] = sign * np.linalg.det(minors)
 
     return C
 
@@ -344,7 +345,7 @@ class Conic:
             The conic for which the intersections are to be computed.
         atol : float, optional
             The absolute tolerance to consider an intersection a duplicate of
-            another one.
+            another one, and to consider an intersection conic degenerate.
 
         Returns
         -------
@@ -368,7 +369,7 @@ class Conic:
         poly = np.array([alpha, beta, gamma, delta], dtype=complex)
         La = np.roots(poly)
 
-        Ps = [Conic.__intersect(la, A, B) for la in La]
+        Ps = [Conic.__intersect(la, A, B, atol=atol) for la in La]
         Ps.append(np.empty_like(poly, shape=(3, 0)))
         PP = np.column_stack(Ps)
 
@@ -376,16 +377,18 @@ class Conic:
         mask = ~np.any(~np.isclose(np.imag(PP), 0), axis=0)
         PP = PP[..., mask]
 
-        return projectively_unique(np.real(PP))
+        return projectively_unique(np.real(PP), atol=atol)
 
     @staticmethod
-    def __intersect(la: float, A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    def __intersect(
+        la: float, A: np.ndarray, B: np.ndarray, *, atol: float = 1e-9
+    ) -> np.ndarray:
         # Set mu arbitrarily to 1 and compute the degenerate conic using the
         # pencil of conics
         C = la * A + B
 
         assert np.isclose(
-            np.linalg.det(C), 0
+            np.linalg.det(C), 0, atol=atol
         ), 'determinant of degenerate conic must be zero'
 
         # Decompose the degenerate conic
