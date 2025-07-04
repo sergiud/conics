@@ -37,7 +37,7 @@ def hnormalized(p: npt.NDArray[np.floating]) -> npt.NDArray[np.floating]:
 
 
 def homogeneous(p: npt.ArrayLike) -> npt.NDArray[np.floating]:
-    """Homogenizes :math:`n`-dimensional points by appendind all ones to the
+    """Homogenizes :math:`n`-dimensional points by appending all ones to the
     last dimension.
 
     Parameters

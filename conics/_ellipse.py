@@ -65,7 +65,7 @@ class Ellipse:
         Parameters
         ----------
         pts: array_like
-            The 2-D points whose closeses (orthogonal) points on the ellipse
+            The 2-D points whose closest (orthogonal) points on the ellipse
             should be determined.
 
         Returns
@@ -123,7 +123,7 @@ class Ellipse:
         Parameters
         ----------
         pts: array_like
-            The 2-D points whose closeses (orthogonal) points on the ellipse
+            The 2-D points whose closest (orthogonal) points on the ellipse
             should be determined.
 
         Returns
