@@ -15,12 +15,11 @@
 # limitations under the License.
 from __future__ import annotations
 
-from collections.abc import Sequence
-from typing import Literal
-
 from .geometry import projectively_unique
 from .geometry import rot2d
+from collections.abc import Sequence
 from scipy.optimize import least_squares
+from typing import Literal
 import itertools
 import numpy as np
 import numpy.typing as npt
