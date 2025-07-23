@@ -666,7 +666,7 @@ class Conic:
         M = np.block([[np.eye(2), -t], [0, 0, 1]])
         return self.transform(M, invert=False)
 
-    def scale(self, sx: foat, sy: float | None = None) -> Conic:
+    def scale(self, sx: float, sy: float | None = None) -> Conic:
         R"""Scales the conic coordinates.
 
         Parameters
