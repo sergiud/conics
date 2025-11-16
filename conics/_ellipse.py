@@ -16,8 +16,9 @@
 from __future__ import annotations
 
 from ._conic import Conic
-from .geometry import rot2d, hnormalized
 from ._utils import polygon_area
+from .geometry import hnormalized
+from .geometry import rot2d
 from scipy.optimize import least_squares
 import numpy as np
 import numpy.typing as npt
