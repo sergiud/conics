@@ -243,11 +243,12 @@ class Ellipse:
         conic = self.to_conic()
         center_distance = line[:2] @ self.center + line[-1]
         intersections = conic.intersect_line(line)
+
         if intersections.shape[1] == 2:
             point_from, point_to = hnormalized(intersections).T
 
-            # create a polygon of the points in area, and compute the area in the
-            # triangle between center and both points
+            # create a polygon of the points in area, and compute the area in
+            # the triangle between center and both points
             poly_shape = np.stack((point_from, point_to, self.center))
             poly_area = polygon_area(poly_shape)
 
@@ -255,7 +256,8 @@ class Ellipse:
             cx, cy = np.moveaxis(poly_shape[:2, :] - self.center[None], -1, 0)
             interior_angles = np.atan2(cy, cx) - self.alpha
 
-            # using the interior angles, compute the section area from the major axis to each point
+            # using the interior angles, compute the section area from the major
+            # axis to each point
             major, minor = self.major_minor
             norm_y = major * np.sin(interior_angles)
             norm_x = minor * np.cos(interior_angles)
@@ -264,19 +266,23 @@ class Ellipse:
                 np.atan2(norm_y, norm_x) * norm_area, -1, 0
             )
 
-            # now subtract to get just the sector area, then subtract the polygon area,
-            # and finally obtain the remainder with respect to the total area
-            # for when these are negative (indicating a reverse direction) of
-            # the intersection points
+            # now subtract to get just the sector area, then subtract the
+            # polygon area, and finally obtain the remainder with respect to the
+            # total area for when these are negative (indicating a reverse
+            # direction) of the intersection points
             sector_area = area_to - area_from
             total_area = self.area
             area = (sector_area - poly_area) % total_area
-            # if the center is negative, but the area is less than half, need to invert
+
+            # if the center is negative, but the area is less than half, need to
+            # invert
             if (center_distance < 0) == (sector_area * 2 < total_area):
                 return total_area - area
+
             return area
         elif center_distance > 0:
             return 0.0
+
         return self.area
 
     @staticmethod
