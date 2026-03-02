@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import numpy as np
 
 def as_ellipse(c, **kwargs):
     x0, major_minor, angle = c.to_ellipse()
-    return Ellipse(x0, *major_minor.ravel() * 2, angle=np.rad2deg(angle), **kwargs)
+    return Ellipse(x0.ravel(), *major_minor.ravel() * 2, angle=np.rad2deg(angle), **kwargs)
 
 
 c1 = Conic.from_circle([0, 0], 1)
