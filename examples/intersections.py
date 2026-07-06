@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Conic intersections
+===================
+
+This example computes the intersections of several pairs of conics: two
+overlapping circles, two circles touching at a single point, and two ellipses
+sharing the same center but with different orientations.
+"""
+
 from conics import Conic
 from conics.geometry import hnormalized
 from matplotlib.patches import Ellipse

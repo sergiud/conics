@@ -1,7 +1,6 @@
 default:
   tags:
     - docker
-  image: sergiud/conics:python3.12
 
 .env_template: &env_definition
   - export PYTHONWARNINGS=error
@@ -14,17 +13,13 @@ default:
     - flake8 .
     - isort --check-only --diff .
 
-lint:python3.12:
-  <<: *lint_definition
-  needs: []
-
-docs:python3.12:
+.build:doc: &doc_definition
   stage: build
   script:
     - sphinx-build -M html docs/ docs/_build -W --keep-going
   needs: []
 
-test:python3.12:
+.test_template: &test_definition
   stage: test
   script:
     - *env_definition
@@ -41,3 +36,48 @@ test:python3.12:
         coverage_format: cobertura
         path: coverage.xml
       junit: pytest.xml
+
+lint:python3.12:
+  <<: *lint_definition
+  image: sergiud/conics:python3.12
+  needs: []
+
+docs:python3.12:
+  <<: *doc_definition
+  image: sergiud/conics:python3.12
+  needs: []
+
+test:python3.12:
+  <<: *test_definition
+  image: sergiud/conics:python3.12
+  needs: []
+
+lint:python3.13:
+  <<: *lint_definition
+  image: sergiud/conics:python3.13
+  needs: []
+
+docs:python3.13:
+  <<: *doc_definition
+  image: sergiud/conics:python3.13
+  needs: []
+
+test:python3.13:
+  <<: *test_definition
+  image: sergiud/conics:python3.13
+  needs: []
+
+lint:python3.14:
+  <<: *lint_definition
+  image: sergiud/conics:python3.14
+  needs: []
+
+docs:python3.14:
+  <<: *doc_definition
+  image: sergiud/conics:python3.14
+  needs: []
+
+test:python3.14:
+  <<: *test_definition
+  image: sergiud/conics:python3.14
+  needs: []

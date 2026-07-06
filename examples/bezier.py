@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Parabola to quadratic Bézier curve conversion
+=============================================
+
+A parabola can be represented exactly by a quadratic (second-degree) Bézier
+curve. This example fits a parabola to a set of observations and converts the
+result into the corresponding Bézier control points.
+"""
+
 from conics import Parabola
 from conics.fitting import fit_nievergelt
 from conics.fitting import parabola_to_bezier

@@ -17,6 +17,7 @@ Features
 
    readme
    usage
+   generated_examples/index.rst
    bibliography
    glossary
    license

@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Fitting and non-linear refinement of an ellipse
+===============================================
+
+This example shows an algebraically fitted ellipse and its non-linearly
+refined variant, together with the orthogonal contact points on the refined
+ellipse.
+"""
+
 from conics import Ellipse
 from conics.fitting import fit_dlt
 from conics.fitting import fit_nievergelt
@@ -24,12 +33,10 @@ import numpy as np
 pts = np.asarray([[0.35, 1.2], [1.5, 1.2], [-2.3, 4.2], [-1, -1.2], [0, -2], [-1, -3]])
 
 pts = np.array([[1, 2, 5, 7, 9, 3, 6, 8], [7, 6, 8, 7, 5, 7, 2, 4]]).T
-# pts = np.array([[1, 2, 5, 7, 9, 6, 3, 8], [7, 6, 8, 7, 5, 7, 2, 4]]).T
 
 C = fit_dlt(pts)
 C = fit_nievergelt(pts, type='ellipse', scale=True)
 e = Ellipse.from_conic(C)
-# e = Ellipse([5, 4], [3, 2], np.pi/4)
 
 e1 = e.refine(pts)
 contact_pts = e.contact(pts)
@@ -39,7 +46,7 @@ ee = mpatches.Ellipse(
     e.center,
     width,
     height,
-    np.rad2deg(e.alpha),
+    angle=np.rad2deg(e.alpha),
     edgecolor='red',
     facecolor='none',
     lw=2,
@@ -50,7 +57,7 @@ ee1 = mpatches.Ellipse(
     e1.center,
     width1,
     height1,
-    np.rad2deg(e1.alpha),
+    angle=np.rad2deg(e1.alpha),
     edgecolor='blue',
     facecolor='none',
     lw=2,

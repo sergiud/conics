@@ -39,6 +39,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('..'))  # nopep8
+sys.path.insert(0, os.path.abspath('_ext'))  # nopep8
 
 import conics.__about__
 
@@ -68,6 +69,7 @@ language = 'en'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
+    'gallery_dark_mode',
     'matplotlib.sphinxext.plot_directive',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
@@ -75,6 +77,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx_copybutton',
+    'sphinx_gallery.gen_gallery',
     'sphinxcontrib.bibtex',
 ]
 
@@ -147,4 +150,11 @@ nitpick_ignore = {
 nitpick_ignore_regex = {
     ('py:class', r'[a-z]([+-]\d+)?'),
     ('py:class', r'\d+'),
+}
+
+sphinx_gallery_conf = {
+    'examples_dirs': '../examples',
+    'filename_pattern': '/',
+    'gallery_dirs': 'generated_examples',
+    'image_scrapers': ('gallery_dark_mode.light_dark_scraper',),
 }

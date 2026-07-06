@@ -14,6 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Conic-line intersections
+========================
+
+This example computes the intersections of a line with several pairs of
+conics: two overlapping circles, two circles touching at a single point, and
+two ellipses sharing the same center but with different orientations.
+"""
+
 from conics import Conic
 from conics.geometry import hnormalized
 from matplotlib.patches import Ellipse
@@ -70,7 +79,6 @@ ax2.add_patch(as_ellipse(c3, facecolor='none', edgecolor='red'))
 ax2.add_patch(as_ellipse(c4, facecolor='none', edgecolor='blue'))
 ax2.contour(X, Y, Z_l, levels=[0])
 ax2.scatter(*inter21.T)
-# ax2.scatter(*inter22.T)
 
 ax3.set_title('Ellipses-line')
 ax3.add_patch(as_ellipse(e1, facecolor='none', edgecolor='red'))

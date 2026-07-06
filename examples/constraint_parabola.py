@@ -14,6 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Constraining a conic to a parabola
+==================================
+
+A conic fitted using the direct linear transform (DLT) is not guaranteed to be
+of a specific type. This example conditions a DLT-fitted conic to be a
+parabola and compares the result against a parabola fitted directly using the
+Nievergelt method.
+"""
+
 from conics.fitting import fit_dlt
 from conics.fitting import fit_nievergelt
 import matplotlib.pyplot as plt

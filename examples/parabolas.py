@@ -14,13 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+Fitting and non-linear refinement of a parabola
+===============================================
+
+This example shows a linearly fitted parabola and its non-linear refined
+variant.
+"""
+
 from conics import Parabola
 from conics.fitting import fit_nievergelt
 import matplotlib.pyplot as plt
 import numpy as np
 
-# x = [-7, -3, 0, 0, 1, 1]
-# y = [9, 5, 4, 8, 3, 5]
 x = [-1, 2, 5, 10, -4]
 y = [1, -2, 3, -4, -3]
 

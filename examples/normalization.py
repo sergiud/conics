@@ -14,6 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+The importance of data normalization
+====================================
+
+Standardizing point coordinates before performing algebraic fitting can
+noticeably improve the numerical conditioning of the resulting estimate. This
+example fits a parabola to points whose coordinate ranges differ substantially
+between the horizontal and vertical axes, once without scaling and once with
+scaling enabled, and compares the two results.
+"""
+
 from conics.fitting import fit_nievergelt
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,18 +45,12 @@ Z1 = C1(np.dstack([X, Y]))
 Z2 = C2(np.dstack([X, Y]))
 
 fig = plt.figure()
-# fig.set_aspect('equal')
 
 ax1, ax2 = fig.subplots(1, 2)
 
-# ax1.set_aspect('equal', 'box')
-# ax2.set_aspect('equal', 'box')
+ax1.contour(X, Y, Z1, levels=0)
 
-cs = ax1.contour(X, Y, Z1, levels=0)
-# cs.collections[1].set_label('fitted parabola (unscaled)')
-
-cs_refined = ax2.contour(X, Y, Z2, colors='red', levels=0)
-# cs_refined.collections[1].set_label('fitted parabola (scaled)')
+ax2.contour(X, Y, Z2, colors='red', levels=0)
 
 ax1.scatter(x, y, label='observations')
 ax2.scatter(x, y)
