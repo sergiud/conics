@@ -24,6 +24,8 @@ from conics import estimate_pose
 from conics import projected_center
 from conics import surface_normal
 from conics._conic import _make_circle
+from conics._conic import adjugate
+from conics._conic import cofactor
 from conics._conic import concentric_conics_vanishing_line
 from conics.geometry import hnormalized
 import numpy as np
@@ -206,6 +208,25 @@ def test_conic_normalizaiton():
     det = np.linalg.det(c2.homogeneous)
 
     np.testing.assert_almost_equal(det, -1)
+
+
+def test_adjugate_ill_conditioned_matrix():
+    # A symmetric, extremely ill-conditioned matrix (condition number
+    # ~1e16) representative of the degenerate conic pencil built inside
+    # Conic.intersect, where the determinant is only close to, but not
+    # exactly, zero. adjugate() must remain accurate here regardless of
+    # how it is computed internally.
+    C = np.array(
+        [
+            [111641780.65419222, -195624253.63503367, -126677048.79394355],
+            [-195624253.63503367, 342782499.40137404, 221969794.62162852],
+            [-126677048.79394355, 221969794.62162852, 143737179.72887397],
+        ]
+    )
+
+    expected = np.transpose(cofactor(C))
+
+    np.testing.assert_allclose(adjugate(C), expected, rtol=1e-6)
 
 
 def test_circle_determinant():

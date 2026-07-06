@@ -123,12 +123,12 @@ def cofactor(A: np.ndarray) -> np.ndarray:
 
 
 def adjugate(C: npt.ArrayLike) -> np.ndarray:
-    det = np.linalg.det(C)
-
-    if det == 0:
-        return np.transpose(cofactor(C))
-
-    return np.linalg.inv(C).T * det
+    # NOTE always computed via cofactors rather than inv(C).T * det(C): the
+    # only caller (Conic.__intersect) applies this to matrices that are
+    # singular by construction up to round-off, so det(C) is essentially
+    # never exactly zero and the inverse-based shortcut would silently invert
+    # an (near-)singular, badly conditioned matrix instead.
+    return np.transpose(cofactor(C))
 
 
 def skew_symmetric(C: Sequence[float]) -> np.ndarray:
