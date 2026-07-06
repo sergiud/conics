@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -200,6 +200,12 @@ def _compute_ellipse(M):
     C = np.diag([-2, 1, -2])[..., ::-1]
 
     evals, evecs = np.linalg.eig(np.linalg.solve(C, M))
+    # The generalized eigenproblem is guaranteed to have real eigenpairs;
+    # np.linalg.eig still returns a complex dtype whenever the input is not
+    # symmetric, which otherwise poisons all downstream computations (e.g.
+    # np.arctan2 rejects complex input even when the imaginary part is 0).
+    evals = evals.real
+    evecs = evecs.real
     k = np.diagonal(evecs.T @ C @ evecs)
 
     u = np.argmin(k)

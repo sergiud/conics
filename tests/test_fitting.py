@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -188,3 +188,22 @@ def test_harker_perfect_circle():
 
     np.testing.assert_array_almost_equal(e.center, [1, 2])
     np.testing.assert_array_almost_equal(e.major_minor, [1, 1])
+
+
+def test_harker_ellipse_repeated_eigenvalues_stay_real():
+    # Perfectly circular data makes the reduced scatter matrix have two
+    # equal eigenvalues. np.linalg.eig then keeps a complex128 dtype for the
+    # (mathematically real) eigenpairs, which used to propagate all the way
+    # to the geometric conversion and break it.
+    t = np.linspace(-np.pi, np.pi, 37)
+    x = 3 * np.cos(t) - 2
+    y = 3 * np.sin(t) + 4
+
+    C = fit_harker(np.vstack((x, y)), type='ellipse')
+
+    assert not np.iscomplexobj(C.coeffs_)
+
+    e = Ellipse.from_conic(C)
+
+    np.testing.assert_array_almost_equal(e.center, [-2, 4])
+    np.testing.assert_array_almost_equal(e.major_minor, [3, 3])

@@ -2,7 +2,7 @@
 
 # conics - Python library for dealing with conics
 #
-# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import conics.__about__
 
 # General information about the project.
 project = 'conics'
-copyright = '2025, Sergiu Deitsch'
+copyright = '2026, Sergiu Deitsch'
 author = 'Sergiu Deitsch'
 
 # The version info for the project you're documenting, acts as replacement
