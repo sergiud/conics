@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -349,9 +349,9 @@ class Conic:
         Returns
         -------
         numpy.ndarray
-            A matrix of homogeneous 2-D points stored in column vectors
-            of a :math:`3\times N` matrix consisting of :math:`0\leq
-            N\leq 4` columns.
+            A matrix of homogeneous 2-D points stored in row vectors
+            of an :math:`N\times3` matrix consisting of :math:`0\leq
+            N\leq 4` rows.
 
 
         .. plot:: ../examples/intersections.py
@@ -369,12 +369,12 @@ class Conic:
         La = np.roots(poly)
 
         Ps = [Conic.__intersect(la, A, B, atol=atol) for la in La]
-        Ps.append(np.empty_like(poly, shape=(3, 0)))
-        PP = np.column_stack(Ps)
+        Ps.append(np.empty_like(poly, shape=(0, 3)))
+        PP = np.vstack(Ps)
 
         # Use points that consists of real values only
-        mask = ~np.any(~np.isclose(np.imag(PP), 0), axis=0)
-        PP = PP[..., mask]
+        mask = ~np.any(~np.isclose(np.imag(PP), 0), axis=-1)
+        PP = PP[mask]
 
         return projectively_unique(np.real(PP), atol=atol)
 
@@ -399,7 +399,7 @@ class Conic:
         # Diagonal element being zero indicates that the conic cannot be
         # decomposed since this causes a division by zero.
         if BB_diag[i] == 0:
-            return np.empty_like(BB_diag, shape=(3, 0))
+            return np.empty_like(BB_diag, shape=(0, 3))
 
         # NOTE There's a typo in the book; a minus in the sqrt term is missing.
         bb2 = -BB[i, i]
@@ -414,7 +414,7 @@ class Conic:
         i, j = np.unravel_index(np.argmax(np.abs(CC)), CC.shape)
 
         if CC[i, j] == 0:
-            return np.empty_like(CC, shape=(3, 0))
+            return np.empty_like(CC, shape=(0, 3))
 
         # Lines constituting the degenerate conic
         g = CC[i, :]
@@ -423,12 +423,12 @@ class Conic:
         P1 = Conic.__intersect_line(A, g)
         P2 = Conic.__intersect_line(A, h)
 
-        return np.column_stack((P1, P2))
+        return np.vstack((P1, P2))
 
     @staticmethod
     def __intersect_line(A: np.ndarray, l: np.ndarray) -> np.ndarray:
         if np.all(np.equal(l, 0)):
-            return np.empty_like(A, shape=(3, 0))
+            return np.empty_like(A, shape=(0, 3))
 
         A = np.asarray(A, dtype=complex)
 
@@ -454,7 +454,7 @@ class Conic:
         P1 = C[i, :]
         P2 = C[:, j]
 
-        return np.column_stack((P1, P2))
+        return np.stack((P1, P2), axis=0)
 
     @staticmethod
     def __factors() -> np.ndarray:
@@ -475,17 +475,17 @@ class Conic:
         Returns
         -------
         numpy.ndarray
-            A matrix of homogeneous 2-D points stored in column vectors
-            of a :math:`3\times N` matrix consisting of :math:`0\leq
-            N\leq 2` columns.
+            A matrix of homogeneous 2-D points stored in row vectors
+            of an :math:`N\times3` matrix consisting of :math:`0\leq
+            N\leq 2` rows.
 
 
         .. plot:: ../examples/line_intersections.py
         """
 
         inter = Conic.__intersect_line(self.homogeneous, l)
-        mask = np.all(np.isclose(np.imag(inter), 0), axis=0)
-        return projectively_unique(np.real(inter[..., mask]))
+        mask = np.all(np.isclose(np.imag(inter), 0), axis=-1)
+        return projectively_unique(np.real(inter[mask]))
 
     @staticmethod
     def from_ellipse(
@@ -749,12 +749,19 @@ class Conic:
         return Conic(self.coeffs_ + other.coeffs_)
 
     def __call__(self, pts: npt.ArrayLike) -> np.ndarray:
-        """Evaluates the conic on the points `pts`."""
+        r"""Evaluates the conic on the points `pts`.
 
-        s = np.shape(pts)
+        The coordinate axis of `pts` is expected to be the last one, e.g.
+        :math:`(\ldots,2)` for inhomogeneous or :math:`(\ldots,3)` for
+        homogeneous points.
+        """
+
+        # Move the coordinate axis to the front to evaluate the conic.
+        pts = np.moveaxis(np.asarray(pts), -1, 0)
+        s = pts.shape
 
         if s[0] == 2:
-            x, y = np.asarray(pts)
+            x, y = pts
             A, B, C, D, E, F = self.coeffs_
             return A * x**2 + B * x * y + C * y**2 + D * x + E * y + F
 
@@ -860,21 +867,23 @@ class Conic:
         Parameters
         ----------
         pts : numpy.ndarray
-            2-D coordinates where the gradient is evaluated.
+            2-D coordinates, stored as rows, where the gradient is
+            evaluated.
 
         Returns
         -------
         numpy.ndarray
-            The gradient vector with respect to each 2-D coordinate.
+            The gradient vector with respect to each 2-D coordinate,
+            stored as rows.
         """
 
         a, b, c, d, e, f = self.coeffs_
-        x, y = pts
+        x, y = np.transpose(pts)
 
         dx = 2 * a * x + b * y + d
         dy = b * x + 2 * c * y + e
 
-        return np.vstack((dx, dy))
+        return np.stack((dx, dy), axis=-1)
 
     def constrain(
         self,
@@ -887,8 +896,8 @@ class Conic:
         Parameters
         ----------
         pts : numpy.ndarray
-            :math:`n` 2-D coordinates given by a :math:`2\times n`
-            matrix where each coordinate is stored in a column. The
+            :math:`n` 2-D coordinates given by an :math:`n\times2`
+            matrix where each coordinate is stored in a row. The
             conditioning is performed with respect to the specified
             coordinates.
         type : str
@@ -936,7 +945,7 @@ class Conic:
             fix_angle = True
 
         def fun(a: np.ndarray, pts: np.ndarray) -> np.ndarray:
-            x, y = pts
+            x, y = pts.T
             A, B, C, D, E, F = a  # / Conic.__factors()
 
             f = (
@@ -956,7 +965,7 @@ class Conic:
             return residuals
 
         def jac(a: np.ndarray, pts: np.ndarray) -> np.ndarray:
-            x, y = pts
+            x, y = pts.T
             A, B, C, D, E, F = a  # / Conic.__factors()
 
             top = np.column_stack(

@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -152,11 +152,11 @@ def fit_nievergelt(pts, type='parabola', scale=False):
         points.
 
     """
-    mean = np.mean(pts, axis=1)
-    centered = pts - mean[..., np.newaxis]
+    mean = np.mean(pts, axis=0)
+    centered = pts - mean
 
     if scale:
-        std = np.sqrt(np.mean(centered**2, axis=1))[..., np.newaxis]
+        std = np.sqrt(np.mean(centered**2, axis=0))
 
         if not np.isclose(std, np.zeros_like(std)).any():
             centered /= std
@@ -166,12 +166,12 @@ def fit_nievergelt(pts, type='parabola', scale=False):
     else:
         std = None
 
-    x, y = centered
+    x, y = centered.T
     x2 = x**2
     y2 = y**2
-    xy = np.prod(centered, axis=0).T
+    xy = np.prod(centered, axis=1)
 
-    M23 = centered.T
+    M23 = centered
     M = np.column_stack((np.ones_like(x), M23, y2 - x2, 2 * xy, x2 + y2))
 
     # M1 = M[:, 0]

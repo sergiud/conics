@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -73,7 +73,10 @@ class Parabola:
         pts = np.atleast_2d(pts)
 
         R = rot2d(self.alpha)
-        pts1 = R.T @ (pts - self.vertex[..., np.newaxis])
+        # Rotate into the parabola-local frame. Since `pts` stores points as
+        # rows, the transform is applied on the right instead of
+        # transposing `pts` and using R.T on the left.
+        pts1 = (pts - self.vertex) @ R
 
         def jac(xy, xi, yi):
             x, y = xy
@@ -90,7 +93,7 @@ class Parabola:
 
         pts2 = np.empty_like(pts1)
 
-        for i, xiyi in enumerate(pts1.T):
+        for i, xiyi in enumerate(pts1):
             xi, yi = xiyi
             mask = xi < 0
             y2s = np.sqrt(2 * self.p * xi, out=np.zeros_like(xi), where=~mask)
@@ -101,9 +104,9 @@ class Parabola:
             r = least_squares(fun, x0, args=(xi, yi), jac=jac, **kwargs)
             # TODO check convergence
 
-            pts2[:, i] = r.x
+            pts2[i, :] = r.x
 
-        return R @ pts2 + self.vertex[..., np.newaxis]
+        return pts2 @ R.T + self.vertex
 
     def refine(self, pts, **kwargs):
         """Refines the parabola parameters with respect to some reference 2-D
@@ -137,7 +140,7 @@ class Parabola:
             residuals = xy - pts
 
             # Stack residuals for x and y component after each other
-            return np.ravel(residuals, order='F')
+            return np.ravel(residuals)
 
         def jac(a, pts):
             xc, yc, p, alpha = a
@@ -148,9 +151,12 @@ class Parabola:
             R = rot2d(alpha)
             c, s = R[0]
 
-            vertex = np.array([[xc], [yc]])
-            x, y = R.T @ (xy - vertex)
-            xi, yi = R.T @ (pts - vertex)
+            vertex = np.array([xc, yc])
+            # Rotate into the local frame on the right (points are stored as
+            # rows), then transpose the small result for the dense
+            # elementwise math below.
+            x, y = ((xy - vertex) @ R).T
+            xi, yi = ((pts - vertex) @ R).T
 
             ones = np.ones_like(x)
             zeros = np.zeros_like(x)

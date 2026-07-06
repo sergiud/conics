@@ -1,7 +1,7 @@
 #
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ def test_up_parabola_contact_points():
     x = np.arange(-4, 4 + 1)
     y = x**2 + 5
 
-    pts = np.vstack((x, y))
+    pts = np.column_stack((x, y))
 
     C = fit_nievergelt(pts, type='parabola', scale=True)
     p = Parabola.from_conic(C)
@@ -40,7 +40,7 @@ def test_parabola1():
     x = [-1, 2, 5, 10, -4]
     y = [1, -2, 3, -4, -3]
 
-    pts = np.vstack((x, y))
+    pts = np.column_stack((x, y))
 
     p1 = Parabola([-4.707, -1.269], 0.512, 0.088)
 

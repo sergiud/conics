@@ -19,7 +19,7 @@ import numpy as np
 
 
 def _build_scatter_matrices(pts):
-    x, y = pts
+    x, y = pts.T
 
     x2 = x**2
     xy = x * y
@@ -33,7 +33,7 @@ def _build_scatter_matrices(pts):
     xy -= xym
     y2 -= y2m
 
-    D1 = pts.T
+    D1 = pts
     D2 = np.column_stack((x2, xy, y2))
     S22 = D2.T @ D2
     S21 = D2.T @ D1
@@ -139,7 +139,7 @@ def _diff2_mu_sqr_error(mu, Q0, Q1, Q2, R0, R1, R2):
 
 
 def _correct_bias(pts, S11, S21, S22, z_e, z_h, x2m, xym, y2m, k_e, k_h):
-    x, y = pts
+    x, y = pts.T
 
     zeros = np.zeros_like(x)
     ones = np.ones_like(x)
@@ -224,8 +224,8 @@ def _compute_ellipse(M):
 
 
 def fit_harker(pts, type):
-    mean = np.mean(pts, axis=1)
-    centered = pts - mean[..., np.newaxis]
+    mean = np.mean(pts, axis=0)
+    centered = pts - mean
 
     scale = np.sqrt(np.mean(centered**2))
     scale_inv = 1 / scale
@@ -275,18 +275,18 @@ if __name__ == '__main__':
     # x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
     # y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
 
-    # pts = rot2d(np.pi / 4 * 0) @ np.vstack((x, y))
-    pts = np.vstack((x, y))
+    # pts = np.column_stack((x, y)) @ rot2d(np.pi / 4 * 0).T
+    pts = np.column_stack((x, y))
 
     C = fit_harker(pts, type='ellipse')
 
     X, Y = np.meshgrid(
-        np.linspace(np.min(pts[0]) - 1, np.max(pts[0]) + 1),
-        np.linspace(-1 + np.min(pts[1]), np.max(pts[1]) + 1),
+        np.linspace(np.min(pts[:, 0]) - 1, np.max(pts[:, 0]) + 1),
+        np.linspace(-1 + np.min(pts[:, 1]), np.max(pts[:, 1]) + 1),
     )
-    Z = C(np.vstack((X.ravel(), Y.ravel())))
+    Z = C(np.column_stack((X.ravel(), Y.ravel())))
 
     plt.figure()
     plt.contour(X, Y, Z.reshape(X.shape), levels=0)
-    plt.scatter(*pts)
+    plt.scatter(*pts.T)
     plt.show()

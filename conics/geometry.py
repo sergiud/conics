@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,16 +24,17 @@ def hnormalized(p: npt.NDArray[np.floating]) -> npt.NDArray[np.floating]:
 
     Parameters
     ----------
-    p: numpy.ndarray (n, m)
+    p: numpy.ndarray (m, n)
         The :math:`n`-dimensional points to be projected stored in :math:`m`
-        columns.
+        rows.
 
     Returns
     -------
-    numpy.ndarray (n-1, m):
+    numpy.ndarray (m, n-1):
         The projected points.
     """
-    return p[:-1] / p[-1]
+    p = np.asarray(p)
+    return p[..., :-1] / p[..., -1:]
 
 
 def homogeneous(p: npt.ArrayLike) -> npt.NDArray[np.floating]:
@@ -42,17 +43,18 @@ def homogeneous(p: npt.ArrayLike) -> npt.NDArray[np.floating]:
 
     Parameters
     ----------
-    p: numpy.ndarray (n, m)
-        The :math:`n`-dimensional points to be homogenized stored in :math:`m`
-        columns.
+    p: numpy.ndarray (m, n)
+        The :math:`n`-dimensional points to be homogenized stored in
+        :math:`m` rows.
 
     Returns
     -------
-    numpy.ndarray (n+1, m)
+    numpy.ndarray (m, n+1)
         The homogenized points.
     """
-    p = np.atleast_2d(p).T
-    return np.vstack((p, np.ones_like(p[0])))
+    p = np.atleast_1d(np.asarray(p, dtype=float))
+    ones = np.ones_like(p[..., :1])
+    return np.concatenate((p, ones), axis=-1)
 
 
 def line_through(a: npt.ArrayLike, b: npt.ArrayLike) -> npt.NDArray[np.floating]:
@@ -117,9 +119,9 @@ def projectively_unique(p: npt.ArrayLike, atol: float = 1e-4) -> np.ndarray:
 
     Parameters
     ----------
-    p: array_like (n, m)
+    p: array_like (m, n)
         The possibly non-unique but equivalent up to scale set
-        :math:`d`-dimensional points stored in :math:`m` columns.
+        :math:`d`-dimensional points stored in :math:`m` rows.
     atol: float
         The absolute comparison tolerance with respect to the norm of the
         cross-product of each point pair. The corresponding norm must be (close
@@ -132,14 +134,14 @@ def projectively_unique(p: npt.ArrayLike, atol: float = 1e-4) -> np.ndarray:
         The subset of points that are unique in projective space.
     """
     p = np.asarray(p)
-    n = p.shape[-1]
+    n = p.shape[-2]
     # The indices of the strictly upper-triangular part of the adjacency
     # matrix
     i, j = np.triu_indices(n, k=1)
 
     # Pairwise cross-product between each intersection for filtering out
     # multiplicative multiples
-    c = np.cross(p.T[i], p.T[j])
+    c = np.cross(p[..., i, :], p[..., j, :])
 
     # Compute the norm of the cross-products which is zero for a pair of
     # intersections that are equivalent up to scale
@@ -148,4 +150,4 @@ def projectively_unique(p: npt.ArrayLike, atol: float = 1e-4) -> np.ndarray:
 
     # mark points as duplicate if cross product with an earlier point has 0 norm
     duplicate = np.bincount(j, m) > 0
-    return p[:, ~duplicate]
+    return p[..., ~duplicate, :]

@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import numpy as np
 x = [-1, 2, 5, 10, -4]
 y = [1, -2, 3, -4, -3]
 
-pts = np.vstack((x, y))
+pts = np.column_stack((x, y))
 
 C = fit_nievergelt(pts, type='parabola', scale=False)
 
@@ -32,7 +32,7 @@ X, Y = np.meshgrid(
     np.linspace(np.min(x) - 3, np.max(x) + 1),
     np.linspace(-1 + np.min(y), np.max(y) + 1),
 )
-Z = C([X, Y])
+Z = C(np.dstack([X, Y]))
 
 p = Parabola.from_conic(C)
 
@@ -41,7 +41,7 @@ C_refined = p_refined.to_conic()
 
 contact_pts = p_refined.contact(pts)
 
-Z_refined = C_refined([X, Y])
+Z_refined = C_refined(np.dstack([X, Y]))
 
 plt.figure()
 plt.axis('equal')
@@ -54,10 +54,10 @@ artists2, _ = cs_refined.legend_elements()
 
 plt.scatter(x, y, label='observations')
 
-for xy in np.dstack((contact_pts.T, pts.T)):
+for xy in np.dstack((contact_pts, pts)):
     plt.plot(*xy, '--', c='gray')
 
-plt.scatter(*contact_pts, label='orthogonal contact points')
+plt.scatter(*contact_pts.T, label='orthogonal contact points')
 
 a, l = plt.gca().get_legend_handles_labels()
 

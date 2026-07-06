@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,22 +33,22 @@ def test_intersecting_lines():
     np.testing.assert_(not np.isclose(p[-1], 0))
 
     np.testing.assert_array_equal(hnormalized(p), 0.5)
-    np.testing.assert_array_equal(homogeneous([0.5, 0.5]), np.atleast_2d(p / p[-1]).T)
+    np.testing.assert_array_equal(homogeneous([0.5, 0.5]), p / p[-1])
 
 
 def test_projectively_unique_empty():
-    a = projectively_unique(np.empty((3, 0)))
-    assert a.shape == (3, 0)
+    a = projectively_unique(np.empty((0, 3)))
+    assert a.shape == (0, 3)
 
 
 def test_projectively_unique_all():
-    a = projectively_unique([[0, 1], [0, 1], [0, 1]])
-    np.testing.assert_array_equal(a, [[0], [0], [0]])
+    a = projectively_unique([[0, 0, 0], [1, 1, 1]])
+    np.testing.assert_array_equal(a, [[0, 0, 0]])
 
 
 def test_projectively_unique():
-    a = projectively_unique([[1, 2, 3], [1, 2, 3], [1, 2, 3]])
-    np.testing.assert_array_equal(a, [[1], [1], [1]])
+    a = projectively_unique([[1, 1, 1], [2, 2, 2], [3, 3, 3]])
+    np.testing.assert_array_equal(a, [[1, 1, 1]])
 
 
 def test_projectively_unique_four_intersections():
@@ -56,7 +56,7 @@ def test_projectively_unique_four_intersections():
     e2 = Conic.from_ellipse([0, 0], [2, 1], np.pi * 3 / 4)
 
     inter = hnormalized(e1.intersect(e2))
-    assert inter.shape == (2, 4)
+    assert inter.shape == (4, 2)
 
 
 def test_projectively_unique_one_intersection():
@@ -64,7 +64,7 @@ def test_projectively_unique_one_intersection():
     c2 = c1.translate([2 * 1, 0])
 
     inter = hnormalized(c1.intersect(c2))
-    assert inter.shape == (2, 1)
+    assert inter.shape == (1, 2)
 
 
 def test_projectively_unique_two_intersections():

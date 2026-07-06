@@ -1,7 +1,7 @@
 #
 # conics - Python library for dealing with conics
 #
-# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -274,17 +274,17 @@ def test_single_circle_intersection():
     c2 = Conic.from_circle([2, 0], 1)
 
     inter = c1.intersect(c2)
-    den = inter[-1, ...]
-    inter = np.real(inter[..., np.isreal(den)])
-    # Remove duplicate columns
-    inter = np.unique(inter, axis=1)
+    den = inter[..., -1]
+    inter = np.real(inter[np.isreal(den)])
+    # Remove duplicate rows
+    inter = np.unique(inter, axis=0)
 
     hinter = hnormalized(inter)
-    hinter = np.unique(hinter, axis=1)
+    hinter = np.unique(hinter, axis=0)
 
-    assert np.size(hinter, axis=-1) == 1
+    assert np.size(hinter, axis=0) == 1
 
-    np.testing.assert_array_almost_equal(hinter, [[1], [0]])
+    np.testing.assert_array_almost_equal(hinter, [[1, 0]])
 
     c = c1 - c2
 
@@ -298,7 +298,7 @@ def test_ellipse_four_intersections():
 
     inter = hnormalized(e1.intersect(e2))
 
-    assert np.size(inter, axis=-1) == 4
+    assert np.size(inter, axis=0) == 4
 
     np.testing.assert_array_almost_equal(e1(inter), 0)
     np.testing.assert_array_almost_equal(e2(inter), 0)
@@ -344,7 +344,7 @@ def test_complex_circle_intersection():
 
 def test_evaluate_hnormalized():
     c = Conic.from_homogeneous(np.eye(3))
-    pts = np.ones((2, 4))
+    pts = np.ones((4, 2))
 
     values = c(pts)
     np.testing.assert_array_equal(values, 3)
@@ -352,7 +352,7 @@ def test_evaluate_hnormalized():
 
 def test_evaluate_homogeneous():
     c = Conic.from_homogeneous(np.eye(3))
-    pts = np.ones((3, 4))
+    pts = np.ones((4, 3))
 
     values = c(pts)
     np.testing.assert_array_equal(values, 3)
@@ -360,7 +360,7 @@ def test_evaluate_homogeneous():
 
 def test_evaluate_hnormalized_ndim():
     c = Conic.from_homogeneous(np.eye(3))
-    pts = np.ones((2, 1, 1, 1, 4))
+    pts = np.ones((1, 1, 1, 4, 2))
 
     values = c(pts)
     np.testing.assert_array_equal(values, 3)
@@ -368,7 +368,7 @@ def test_evaluate_hnormalized_ndim():
 
 def test_evaluate_homogeneous_ndim():
     c = Conic.from_homogeneous(np.eye(3))
-    pts = np.ones((3, 1, 1, 1, 4))
+    pts = np.ones((1, 1, 1, 4, 3))
 
     values = c(pts)
     np.testing.assert_array_equal(values, 3)
@@ -399,7 +399,7 @@ def test_circle_line_single_intersection(d):
 
     inter = hnormalized(c.intersect_line(l))
 
-    assert inter.shape == (2, 1)
+    assert inter.shape == (1, 2)
 
     np.testing.assert_array_almost_equal(c(inter), 0)
 
@@ -413,7 +413,7 @@ def test_circle_line_no_intersection(d):
 
     inter = c.intersect_line(l)
 
-    assert inter.shape == (3, 0)
+    assert inter.shape == (0, 3)
 
     np.testing.assert_array_almost_equal(c(inter), 0)
 
@@ -425,6 +425,6 @@ def test_circle_infinite_line_intersection():
 
     inter = c.intersect_line(l)
 
-    assert inter.shape == (3, 0)
+    assert inter.shape == (0, 3)
 
     np.testing.assert_array_almost_equal(c(inter), 0)

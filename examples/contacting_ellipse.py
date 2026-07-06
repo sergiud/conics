@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,12 +21,10 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 
-pts = np.asarray(
-    [[0.35, 1.2], [1.5, 1.2], [-2.3, 4.2], [-1, -1.2], [0, -2], [-1, -3]]
-).T
+pts = np.asarray([[0.35, 1.2], [1.5, 1.2], [-2.3, 4.2], [-1, -1.2], [0, -2], [-1, -3]])
 
-pts = np.array([[1, 2, 5, 7, 9, 3, 6, 8], [7, 6, 8, 7, 5, 7, 2, 4]])
-# pts = np.array([ [1, 2, 5, 7, 9, 6, 3, 8], [7, 6, 8, 7, 5, 7, 2, 4]])
+pts = np.array([[1, 2, 5, 7, 9, 3, 6, 8], [7, 6, 8, 7, 5, 7, 2, 4]]).T
+# pts = np.array([[1, 2, 5, 7, 9, 6, 3, 8], [7, 6, 8, 7, 5, 7, 2, 4]]).T
 
 C = fit_dlt(pts)
 C = fit_nievergelt(pts, type='ellipse', scale=True)
@@ -62,6 +60,6 @@ plt.figure()
 plt.axis('equal')
 plt.gca().add_patch(ee)
 plt.gca().add_patch(ee1)
-plt.scatter(*pts)
-plt.scatter(*contact_pts)
+plt.scatter(*pts.T)
+plt.scatter(*contact_pts.T)
 plt.show()

@@ -1,7 +1,7 @@
 #
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,9 @@ import numpy as np
 
 
 def test_ellipse_fitting():
-    pts = np.array([[1, 2, 5, 7, 9, 3, 6, 8], [7, 6, 8, 7, 5, 7, 2, 4]])
+    x = [1, 2, 5, 7, 9, 3, 6, 8]
+    y = [7, 6, 8, 7, 5, 7, 2, 4]
+    pts = np.column_stack((x, y))
 
     C = fit_dlt(pts)
     C = fit_nievergelt(pts, type='ellipse', scale=True)

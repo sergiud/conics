@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ def fit_dlt(pts):
     conics.Conic
         The estimated conic.
     """
-    x, y = pts
+    x, y = pts.T
 
     A = np.column_stack((x**2, x * y, y**2, x, y, np.ones_like(x)))
 
@@ -69,7 +69,7 @@ def parabola_to_bezier(parabola, start, end):
     Returns
     -------
     numpy.ndarray
-        A :math:`2\times3` matrix of whose columns denote the three
+        A :math:`3\times2` matrix whose rows denote the three
         control points of the Bezier curve.
 
     Raises
@@ -80,19 +80,19 @@ def parabola_to_bezier(parabola, start, end):
         be degenerate and correspond, e.g., to a straight line.
     """
 
-    s1, s2 = parabola.contact(np.column_stack((start, end))).T
+    s1, s2 = parabola.contact(np.stack((start, end)))
     C = parabola.to_conic()
 
-    grad = C.gradient(np.column_stack((s1, s2)))
+    grad = C.gradient(np.stack((s1, s2)))
 
     # Normalize gradients
-    grad /= np.linalg.norm(grad, axis=0)
+    grad /= np.linalg.norm(grad, axis=1, keepdims=True)
     # Rotate vectors by 90 degrees by swapping the x/y coordinates and
     # multiplying y with -1
-    grad = grad[::-1]
-    grad[0] *= -1
+    grad = grad[:, ::-1]
+    grad[:, 0] *= -1
 
-    dxy1, dxy2 = grad.T
+    dxy1, dxy2 = grad
     # Start gradient should be facing the opposite direction of the second
     # gradient
     dxy1 *= -1
@@ -109,4 +109,4 @@ def parabola_to_bezier(parabola, start, end):
 
     inter = hnormalized(inter)
 
-    return np.column_stack((s1, inter, s2))
+    return np.stack((s1, inter, s2))

@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2024 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import numpy as np
 y = [-2, -0.1, 0, 1, 2, 3, 4, 5, 6, 7, 8]
 x = [1, 0.5, 0.1, 0, 0, 0, 0.2, 0.3, 0.4, 0.5, 0.6]
 
-pts = np.vstack((x, y))
+pts = np.column_stack((x, y))
 
 C1 = fit_nievergelt(pts, type='parabola', scale=False)
 C2 = fit_nievergelt(pts, type='parabola', scale=True)
@@ -30,8 +30,8 @@ X, Y = np.meshgrid(
     np.linspace(np.min(x) - 1, np.max(x) + 1),
     np.linspace(-1 + np.min(y), np.max(y) + 1),
 )
-Z1 = C1([X, Y])
-Z2 = C2([X, Y])
+Z1 = C1(np.dstack([X, Y]))
+Z2 = C2(np.dstack([X, Y]))
 
 fig = plt.figure()
 # fig.set_aspect('equal')

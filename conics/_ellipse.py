@@ -1,6 +1,6 @@
 # conics - Python library for dealing with conics
 #
-# Copyright 2025 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+# Copyright 2026 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -86,8 +86,10 @@ class Ellipse:
         pts = np.atleast_2d(pts)
 
         R = rot2d(self.alpha)
-        center = self.center[..., np.newaxis]
-        pts1 = R.T @ (pts - center)
+        # Rotate into the ellipse-local frame. Since `pts` stores points as
+        # rows, the transform is applied on the right instead of
+        # transposing `pts` and using R.T on the left.
+        pts1 = (pts - self.center) @ R
 
         a, b = self.major_minor
 
@@ -106,27 +108,29 @@ class Ellipse:
 
             return _jac_contact_point(a, b, x, y, xi, yi)
 
-        xi, yi = pts1
+        xi, yi = pts1.T
 
-        t1, t2 = np.array([[b], [a]]) * pts1
-        xk1 = pts1 * np.prod(pts1, axis=0) / np.hypot(t1, t2)
+        t1, t2 = (pts1 * np.array([b, a])).T
+        xk1 = pts1 * (np.prod(pts1, axis=1) / np.hypot(t1, t2))[..., np.newaxis]
 
         mask = np.abs(xi) < a
         tmp = np.sqrt(a**2 - xi**2, out=np.zeros_like(xi), where=mask)
 
-        xk21 = np.vstack((xi, np.copysign(b / a * tmp, yi)))
-        xk22 = np.vstack((np.copysign(a * np.ones_like(xi), xi), np.zeros_like(xi)))
+        xk21 = np.column_stack((xi, np.copysign(b / a * tmp, yi)))
+        xk22 = np.column_stack(
+            (np.copysign(a * np.ones_like(xi), xi), np.zeros_like(xi))
+        )
 
-        xk2 = np.where(mask, xk21, xk22)
+        xk2 = np.where(mask[..., np.newaxis], xk21, xk22)
 
         x0 = np.mean(np.stack((xk1, xk2)), axis=0)
         x = np.empty_like(pts1)
 
-        for i, (x0i, xyi) in enumerate(zip(x0.T, pts1.T)):
+        for i, (x0i, xyi) in enumerate(zip(x0, pts1)):
             r = least_squares(fun, np.ravel(x0i), args=(xyi,), jac=jac)
-            x[:, i] = r.x
+            x[i, :] = r.x
 
-        return R @ x + center
+        return x @ R.T + self.center
 
     def refine(self, pts: npt.ArrayLike) -> Ellipse:
         """Refine the ellipse non-linearly by minimizing the orthogonal
@@ -156,7 +160,7 @@ class Ellipse:
             residuals = xy - pts
 
             # Stack residuals for x and y component after each other
-            return np.ravel(residuals, order='F')
+            return np.ravel(residuals)
 
         def jac(aa: np.ndarray[tuple[int]], pts: np.ndarray):
             xc, yc, a, b, alpha = aa
@@ -167,9 +171,12 @@ class Ellipse:
             R = rot2d(alpha)
             c, s = R[0]
 
-            center = np.array([[xc], [yc]])
-            xy1 = R.T @ (xy - center)
-            pts1 = R.T @ (pts - center)
+            center = np.array([xc, yc])
+            # Rotate into the local frame on the right (points are stored as
+            # rows), then transpose the small result for the dense
+            # elementwise math below.
+            xy1 = ((xy - center) @ R).T
+            pts1 = ((pts - center) @ R).T
 
             a2 = a**2
             b2 = b**2
@@ -237,15 +244,13 @@ class Ellipse:
             negative half plane of line. This value is nonnegative and bounded
             by the total ellipse area.
         """
-        # NOTE while the library currently uses column-major order, this
-        # function internally uses row-major order
         line = np.asarray(line, "f8")
         conic = self.to_conic()
         center_distance = line[:2] @ self.center + line[-1]
         intersections = conic.intersect_line(line)
 
-        if intersections.shape[1] == 2:
-            point_from, point_to = hnormalized(intersections).T
+        if intersections.shape[0] == 2:
+            point_from, point_to = hnormalized(intersections)
 
             # create a polygon of the points in area, and compute the area in
             # the triangle between center and both points
