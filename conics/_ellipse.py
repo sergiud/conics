@@ -111,7 +111,14 @@ class Ellipse:
         xi, yi = pts1.T
 
         t1, t2 = (pts1 * np.array([b, a])).T
-        xk1 = pts1 * (np.prod(pts1, axis=1) / np.hypot(t1, t2))[..., np.newaxis]
+        den = np.hypot(t1, t2)
+        # den is 0 only when pts1 is at the origin (the ellipse center); fall
+        # back to 0 there instead of NaN so the initial guess below stays
+        # finite and relies solely on xk2.
+        ratio = np.divide(
+            np.prod(pts1, axis=1), den, out=np.zeros_like(den), where=den != 0
+        )
+        xk1 = pts1 * ratio[..., np.newaxis]
 
         mask = np.abs(xi) < a
         tmp = np.sqrt(a**2 - xi**2, out=np.zeros_like(xi), where=mask)

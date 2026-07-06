@@ -51,6 +51,18 @@ def test_ellipse_fitting():
     print(e1.center, e1.major_minor, e1.alpha)
 
 
+def test_ellipse_contact_at_center():
+    # A query point exactly at the ellipse center makes one of the two
+    # candidate initial guesses divide by zero (0/0), which used to turn
+    # into NaN and crash least_squares instead of falling back to the
+    # other, perfectly finite candidate.
+    e = Ellipse([0, 0], [2, 1], 0)
+
+    contact = e.contact([[0, 0]])
+
+    np.testing.assert_array_almost_equal(contact, [[0, 1]])
+
+
 def test_circle():
     c = Conic.from_circle([1, 2], 3)
     C = 4 * c.homogeneous
