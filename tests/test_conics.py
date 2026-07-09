@@ -352,6 +352,29 @@ def test_circle_scale_non_uniform():
     np.testing.assert_array_almost_equal(major_minor.ravel(), [20, 10])
 
 
+def test_intersect_imaginary_filter_respects_atol(monkeypatch):
+    # A near-real intersection point whose imaginary part exceeds numpy's
+    # isclose default tolerance (atol=1e-8) but is well within a looser,
+    # caller-supplied atol. The point should only be discarded when it
+    # falls outside the atol that was actually passed to intersect().
+    near_real_point = np.array([[1.0 + 5e-4j, 2.0 - 5e-4j, 1.0 + 0j]])
+
+    def fake_intersect(la, A, B, atol):
+        return near_real_point
+
+    monkeypatch.setattr(Conic, '_Conic__intersect', staticmethod(fake_intersect))
+
+    e1 = Conic.from_circle([0, 0], 1)
+    e2 = Conic.from_circle([1, 0], 1)
+
+    pts = e1.intersect(e2, atol=1e-3)
+    assert pts.shape[0] == 1
+    np.testing.assert_allclose(pts[0], [1.0, 2.0, 1.0])
+
+    pts = e1.intersect(e2, atol=1e-6)
+    assert pts.shape[0] == 0
+
+
 def test_complex_circle_intersection():
     c1 = Conic.from_circle([0, 0], 1)
     c2 = Conic.from_circle([3, 0], 1)

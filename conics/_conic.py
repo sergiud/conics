@@ -373,7 +373,7 @@ class Conic:
         PP = np.vstack(Ps)
 
         # Use points that consists of real values only
-        mask = ~np.any(~np.isclose(np.imag(PP), 0), axis=-1)
+        mask = ~np.any(~np.isclose(np.imag(PP), 0, atol=atol), axis=-1)
         PP = PP[mask]
 
         return projectively_unique(np.real(PP), atol=atol)
