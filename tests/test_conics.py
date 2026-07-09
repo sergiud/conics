@@ -411,6 +411,24 @@ def test_circle_line_two_intersections(alpha):
     np.testing.assert_array_almost_equal(c(inter), 0)
 
 
+def test_intersect_line_pivot_stability():
+    # A nearly horizontal line y = 0.5, expressed with a tiny x-coefficient.
+    # Its true intersections with the ellipse are at x = +-sqrt(3), y = 0.5.
+    # Selecting this tiny coefficient as pivot (instead of the much larger
+    # y-coefficient) amplifies round-off error and produces wildly wrong
+    # points.
+    e = Conic.from_ellipse([0, 0], [2, 1], 0)
+    l = np.array([1e-9, -1.0, 0.5])
+
+    pts = hnormalized(e.intersect_line(l))
+
+    assert pts.shape == (2, 2)
+    np.testing.assert_allclose(
+        np.sort(pts[..., 0]), [-np.sqrt(3), np.sqrt(3)], atol=1e-6
+    )
+    np.testing.assert_allclose(pts[..., 1], [0.5, 0.5], atol=1e-6)
+
+
 @pytest.mark.parametrize('d', [-1, 1])
 def test_circle_line_single_intersection(d):
     c = Conic.from_circle([0, 0], 1)

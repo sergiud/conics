@@ -437,15 +437,13 @@ class Conic:
         # M_l.T @ A @ M_l
         B = np.einsum('ji,jk,kl->il', M_l, A, M_l)
 
-        for i in range(3):
-            if l[i] == 0:
-                continue
-
-            # If the corresponding coefficient is zero take a different 2x2
-            # (minor) matrix
-            D = np.linalg.det(np.delete(np.delete(B, i, axis=0), i, axis=1))
-            t = l[i]
-            break
+        # Pick the largest-magnitude coefficient as pivot for numerical
+        # stability instead of the first non-zero one: dividing by a small
+        # coefficient (rounding artifact) below would otherwise amplify
+        # round-off error.
+        i = np.argmax(np.abs(l))
+        t = l[i]
+        D = np.linalg.det(np.delete(np.delete(B, i, axis=0), i, axis=1))
 
         alpha = np.sqrt(-D) / t
         C = B + alpha * M_l
