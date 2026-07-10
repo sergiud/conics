@@ -176,11 +176,9 @@ def fit_nievergelt(pts, type='parabola', scale=False):
 
     # M1 = M[:, 0]
 
-    s = np.linalg.svd(M23, full_matrices=False, compute_uv=False)
-    # Singular values are sorted in descending order
-
-    # Condition number max/min
-    k22_inv = np.divide(*s[::-1])
+    # Condition number min/max, i.e. the reciprocal of np.linalg.cond's
+    # (max/min) convention.
+    k22_inv = np.reciprocal(np.linalg.cond(M23))
 
     if np.isclose(k22_inv, 0):
         c = 0
