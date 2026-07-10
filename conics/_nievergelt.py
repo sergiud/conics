@@ -199,17 +199,17 @@ def fit_nievergelt(pts, type='parabola', scale=False):
         R = Q3.T @ M
         R22 = R[3:, 3:]
 
-        if type == 'ellipse' or type == 'hyperbola':
+        if type is None or type == 'ellipse' or type == 'hyperbola':
             u, s, vt = np.linalg.svd(R22)
             q = vt.T[..., -1, np.newaxis]
-
-        # Not specified type or type conic is parabolic:
-        if type == 'parabola':
+        elif type == 'parabola':
             G = R22[:, :2]
 
             p = -R22 @ np.array([[0], [0], [1]])
             q12 = _geodatic(G, p)
             q = np.vstack((q12, [1]))
+        else:
+            raise ValueError('unsupported conic type {}'.format(type))
 
         R11 = R[:3, :3]
         R12 = R[:3, 3:]

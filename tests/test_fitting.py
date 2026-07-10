@@ -177,6 +177,27 @@ def test_harker_spaeth_parabola2():
     np.testing.assert_approx_equal(alpha, np.deg2rad(124.234452))
 
 
+def test_nievergelt_unconstrained_type():
+    t = np.linspace(0, 2 * np.pi, 30, endpoint=False)
+    x = 2 * np.cos(t)
+    y = np.sin(t)
+
+    C = fit_nievergelt(np.column_stack((x, y)), type=None)
+
+    center, major_minor, alpha = C.to_ellipse()
+
+    np.testing.assert_array_almost_equal(center.ravel(), [0, 0])
+    np.testing.assert_array_almost_equal(np.sort(major_minor.ravel()), [1, 2])
+
+
+def test_nievergelt_unsupported_type():
+    x = np.array([-4, -2, -1, 0, 1, 2, 4])
+    y = +(x**2)
+
+    with np.testing.assert_raises(ValueError):
+        fit_nievergelt(np.column_stack((x, y)), type='bogus')
+
+
 def test_harker_perfect_circle():
     t = np.linspace(-np.pi, np.pi)
     x = np.cos(t) + 1
