@@ -186,7 +186,7 @@ def fit_nievergelt(pts, type='parabola', scale=False):
 
         # Fit TLS line
         A = np.column_stack((x, y))
-        u, s, vt = np.linalg.svd(A)
+        u, s, vt = np.linalg.svd(A, full_matrices=False)
         b = -vt.T[:2, -1, np.newaxis]
 
         A = np.zeros((2, 2), dtype=pts.dtype)

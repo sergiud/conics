@@ -43,7 +43,7 @@ def fit_dlt(pts):
 
     A = np.column_stack((x**2, x * y, y**2, x, y, np.ones_like(x)))
 
-    u, s, vt = np.linalg.svd(A)
+    _, _, vt = np.linalg.svd(A, full_matrices=False)
 
     return Conic(vt.T[:, -1])
 
