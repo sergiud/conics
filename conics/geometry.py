@@ -72,8 +72,8 @@ def line_through(a: npt.ArrayLike, b: npt.ArrayLike) -> npt.NDArray[np.floating]
     numpy.ndarray:
         The homogeneous line that connects `a` and `b`.
     """
-    start = np.append(a, 1)
-    end = np.append(b, 1)
+    start = homogeneous(a)
+    end = homogeneous(b)
 
     return np.cross(start, end)
 
