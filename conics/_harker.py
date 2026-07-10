@@ -16,6 +16,7 @@
 
 from ._conic import Conic
 import numpy as np
+import scipy.linalg
 
 
 def _build_scatter_matrices(pts):
@@ -199,11 +200,12 @@ def _correct_bias(pts, S11, S21, S22, z_e, z_h, x2m, xym, y2m, k_e, k_h):
 def _compute_ellipse(M):
     C = np.diag([-2, 1, -2])[..., ::-1]
 
-    evals, evecs = np.linalg.eig(np.linalg.solve(C, M))
+    evals, evecs = scipy.linalg.eig(M, C)
     # The generalized eigenproblem is guaranteed to have real eigenpairs;
-    # np.linalg.eig still returns a complex dtype whenever the input is not
-    # symmetric, which otherwise poisons all downstream computations (e.g.
-    # np.arctan2 rejects complex input even when the imaginary part is 0).
+    # scipy.linalg.eig still returns a complex dtype whenever the pencil is
+    # not symmetric-definite, which otherwise poisons all downstream
+    # computations (e.g. np.arctan2 rejects complex input even when the
+    # imaginary part is 0).
     evals = evals.real
     evecs = evecs.real
     k = np.diagonal(evecs.T @ C @ evecs)
