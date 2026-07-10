@@ -149,7 +149,7 @@ class Parabola:
             xy = pp.contact(pts)
 
             R = rot2d(alpha)
-            c, s = R[0]
+            c, s = R[:, 0]
 
             vertex = np.array([xc, yc])
             # Rotate into the local frame on the right (points are stored as
