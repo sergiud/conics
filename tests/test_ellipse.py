@@ -74,6 +74,19 @@ def test_circle():
     np.testing.assert_almost_equal(r, 3)
 
 
+def test_circle_negative_scale():
+    # A homogeneous conic matrix is only defined up to scale, so negating it
+    # still represents the same circle. Recovering the radius from
+    # sqrt(det(C33)) discards the sign of that scale factor and used to
+    # return the wrong radius whenever the scale was negative.
+    c = Conic.from_circle([1, 2], 3)
+    c1 = Conic.from_homogeneous(-c.homogeneous)
+
+    x0, r = c1.to_circle()
+    np.testing.assert_array_almost_equal(x0, [[1], [2]])
+    np.testing.assert_almost_equal(r, 3)
+
+
 def test_circle_not_circle():
     c = Conic.from_ellipse([1, 2], [4, 3], 0.1)
     C = 4 * c.homogeneous

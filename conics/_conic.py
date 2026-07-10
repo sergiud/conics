@@ -569,8 +569,13 @@ class Conic:
         if np.any(~np.isclose(tmp, 0)):
             raise ValueError('conic is not a circle')
 
-        det = np.linalg.det(C33)
-        s = np.sqrt(det)
+        # A homogeneous conic matrix is only defined up to scale, so C33 is
+        # k * I for some scale factor k that can be of either sign.
+        # sqrt(det(C33)) = sqrt(k**2) = |k| always discards that sign, which
+        # flips the sign of f / s below for a negatively-scaled
+        # representation of the same circle. Reading k directly off the
+        # diagonal keeps its sign.
+        s = np.trace(C33) / 2
         # f = s(x0.T @ x0 - r^2)
         # f/s = x0.T @ x0 - r^2
         # f/s - x0.T @ x0 = -r^2
