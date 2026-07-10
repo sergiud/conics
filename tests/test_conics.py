@@ -91,6 +91,13 @@ def test_construction():
     np.testing.assert_raises(ValueError, Conic, 1, 2)
 
 
+def test_conic_add():
+    c1 = Conic(1, 2, 3, 4, 5, 6)
+    c2 = Conic(6, 5, 4, 3, 2, 1)
+
+    np.testing.assert_array_equal((c1 + c2).coeffs_, [7, 7, 7, 7, 7, 7])
+
+
 def test_unit_circle():
     c = Conic.from_ellipse((0, 0), (1, 1), 0)
     x0, major_minor, alpha = c.to_ellipse()

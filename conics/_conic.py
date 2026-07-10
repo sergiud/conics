@@ -748,7 +748,7 @@ class Conic:
     def __sub__(self, other: Conic) -> Conic:
         return Conic(self.coeffs_ - other.coeffs_)
 
-    def __plus__(self, other: Conic) -> Conic:
+    def __add__(self, other: Conic) -> Conic:
         return Conic(self.coeffs_ + other.coeffs_)
 
     def __call__(self, pts: npt.ArrayLike) -> np.ndarray:
