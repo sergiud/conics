@@ -143,6 +143,10 @@ class Ellipse:
 
         The method uses the approach introduced by :cite:t:`Ahn2001`.
 
+        The analytic Jacobian used by the underlying least-squares solve is
+        cross-checked symbolically and numerically in
+        ``scripts/derive_refine_jacobian.py``.
+
         Parameters
         ----------
         pts: array_like
@@ -174,7 +178,7 @@ class Ellipse:
             xy = e.contact(pts)
 
             R = rot2d(alpha)
-            c, s = R[0]
+            c, s = R[:, 0]
 
             center = np.array([xc, yc])
             # Rotate into the local frame on the right (points are stored as
@@ -192,15 +196,20 @@ class Ellipse:
 
             diff = pts1 - xy1
             dxi, dyi = diff
-            xyxyip = xy1 * pts1
             x2 = x**2
             y2 = y**2
 
-            # TODO Use numpy.einsum to possibly minimize the round-off error
-            xyxyips = np.sum(xyxyip * np.array([[1], [-1]]), axis=0)
+            xyxyips = x * xi - y * yi
 
-            B1 = np.array([[b2 * x * c - a2 * y * s], [b2 * dyi * c + a2 * dxi * s]])
-            B2 = np.array([[b2 * x * s + a2 * y * c], [b2 * dyi * s - a2 * dxi * c]])
+            # The contact point (x, y) depends on the center only through the
+            # local coordinates xi, yi of the input point, so its columns
+            # need the same solve(Q, ...) chain rule treatment as a, b, and
+            # alpha below. Unlike those, the center also appears directly in
+            # the residual (xy1 + center - pts), which contributes an
+            # identity term added back after the solve.
+            zero = np.zeros_like(x)
+            B1 = np.array([[zero], [-(a2 * y * c + b2 * x * s)]])
+            B2 = np.array([[zero], [b2 * x * c - a2 * y * s]])
             B3 = np.array([[a * (b2 - y2)], [+2 * a * y * dxi]])
             B4 = np.array([[b * (a2 - x2)], [-2 * b * x * dyi]])
             B5 = np.array([[(a2 - b2) * xyp], [(a2 - b2) * (x2 - y2 - xyxyips)]])
@@ -212,6 +221,11 @@ class Ellipse:
             Q = np.moveaxis(Q, -1, 0)
 
             J = R @ np.linalg.solve(Q, B)
+            # Add the identity from the center's direct contribution to the
+            # residual to the (xc, yc) columns of every point's 2x5 block, i.e.
+            # J[:, :, :2] += np.eye(2), but touching only the nonzero diagonal
+            # entries instead of the whole 2x2 block.
+            J[:, (0, 1), (0, 1)] += 1
 
             return J.reshape(-1, 5, order='C')
 

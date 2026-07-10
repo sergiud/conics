@@ -67,6 +67,32 @@ def test_ellipse_contact_at_center():
     np.testing.assert_array_almost_equal(contact, [[0, 1]])
 
 
+def test_ellipse_refine_converges():
+    # The analytic Jacobian unpacked a rotation matrix row as
+    # (cos(alpha), -sin(alpha)) into (c, s), instead of (cos(alpha),
+    # sin(alpha)). The resulting sign error, together with a missing direct
+    # contribution of the center to the residual, only affected the center
+    # columns, so refine() made no progress moving the center towards
+    # points it was not already centered on.
+    true_center = np.array([0.3, -0.2])
+    true_major_minor = np.array([2.0, 1.0])
+    true_alpha = 0.4
+
+    t = np.linspace(0, 2 * np.pi, 40, endpoint=False)
+    R = rot2d(true_alpha)
+    local = np.column_stack(
+        (true_major_minor[0] * np.cos(t), true_major_minor[1] * np.sin(t))
+    )
+    pts = local @ R.T + true_center
+
+    guess = Ellipse([0.5, -0.1], [2.2, 1.1], 0.5)
+    fitted = guess.refine(pts)
+
+    np.testing.assert_array_almost_equal(fitted.center, true_center)
+    np.testing.assert_array_almost_equal(fitted.major_minor, true_major_minor)
+    np.testing.assert_almost_equal(fitted.alpha, true_alpha)
+
+
 def test_circle():
     c = Conic.from_circle([1, 2], 3)
     C = 4 * c.homogeneous
