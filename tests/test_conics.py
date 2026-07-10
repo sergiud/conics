@@ -382,6 +382,34 @@ def test_intersect_imaginary_filter_respects_atol(monkeypatch):
     assert pts.shape[0] == 0
 
 
+def test_intersect_line_imaginary_filter_respects_atol(monkeypatch):
+    # Same scenario as test_intersect_imaginary_filter_respects_atol, but
+    # for intersect_line(), which used to hardcode numpy's isclose default
+    # tolerance (atol=1e-8) instead of accepting an atol argument at all.
+    # __intersect_line always returns exactly two rows (a tangent line
+    # yields two projectively equivalent ones), so the fake mirrors that.
+    near_real_point = np.array(
+        [[1.0 + 5e-4j, 2.0 - 5e-4j, 1.0 + 0j], [1.0 + 5e-4j, 2.0 - 5e-4j, 1.0 + 0j]]
+    )
+
+    def fake_intersect_line(A, l):
+        return near_real_point
+
+    monkeypatch.setattr(
+        Conic, '_Conic__intersect_line', staticmethod(fake_intersect_line)
+    )
+
+    c = Conic.from_circle([0, 0], 1)
+    line = np.array([1.0, 0.0, -1.0])
+
+    pts = c.intersect_line(line, atol=1e-3)
+    assert pts.shape[0] == 1
+    np.testing.assert_allclose(pts[0], [1.0, 2.0, 1.0])
+
+    pts = c.intersect_line(line, atol=1e-6)
+    assert pts.shape[0] == 0
+
+
 def test_complex_circle_intersection():
     c1 = Conic.from_circle([0, 0], 1)
     c2 = Conic.from_circle([3, 0], 1)

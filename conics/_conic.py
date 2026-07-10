@@ -138,6 +138,26 @@ def adjugate(C: npt.ArrayLike) -> np.ndarray:
     return np.transpose(cofactor(C))
 
 
+def _real_rows(pts: np.ndarray, atol: float) -> np.ndarray:
+    """Selects rows whose imaginary part is negligible, cast to real.
+
+    Parameters
+    ----------
+    pts : numpy.ndarray (..., n)
+        Rows of possibly complex homogeneous coordinates.
+    atol : float
+        The absolute tolerance below which a row's imaginary part is
+        considered negligible.
+
+    Returns
+    -------
+    numpy.ndarray
+        The rows of `pts` with negligible imaginary part, cast to real.
+    """
+    mask = np.all(np.isclose(np.imag(pts), 0, atol=atol), axis=-1)
+    return np.real(pts[mask])
+
+
 def skew_symmetric(C: Sequence[float]) -> np.ndarray:
     a, b, c = C
     return np.array([[0, c, -b], [-c, 0, a], [b, -a, 0]])
@@ -379,11 +399,7 @@ class Conic:
         Ps.append(np.empty_like(poly, shape=(0, 3)))
         PP = np.vstack(Ps)
 
-        # Use points that consists of real values only
-        mask = ~np.any(~np.isclose(np.imag(PP), 0, atol=atol), axis=-1)
-        PP = PP[mask]
-
-        return projectively_unique(np.real(PP), atol=atol)
+        return projectively_unique(_real_rows(PP, atol), atol=atol)
 
     @staticmethod
     def __intersect(
@@ -465,7 +481,7 @@ class Conic:
     def __factors() -> np.ndarray:
         return np.array([1, 2, 1, 2, 2, 1])
 
-    def intersect_line(self, l: npt.ArrayLike) -> np.ndarray:
+    def intersect_line(self, l: npt.ArrayLike, atol: float = 1e-4) -> np.ndarray:
         r"""Computes the intersections of `self` with a homogeneous line.
 
         A line in homogeneous coordinates is given by :math:`\vec l = (\vec
@@ -476,6 +492,10 @@ class Conic:
         ----------
         l : array_like (3, )
             The homogeneous line to intersect the conic with.
+        atol : float
+            The absolute tolerance below which an intersection point's
+            imaginary part is considered negligible, and below which two
+            real intersection points are considered equivalent.
 
         Returns
         -------
@@ -489,8 +509,7 @@ class Conic:
         """
 
         inter = Conic.__intersect_line(self.homogeneous, l)
-        mask = np.all(np.isclose(np.imag(inter), 0), axis=-1)
-        return projectively_unique(np.real(inter[mask]))
+        return projectively_unique(_real_rows(inter, atol), atol=atol)
 
     @staticmethod
     def from_ellipse(
