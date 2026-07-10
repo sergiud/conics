@@ -108,19 +108,25 @@ def bracket(A: np.ndarray, B: np.ndarray, C: np.ndarray) -> float:
 def cofactor(A: np.ndarray) -> np.ndarray:
     n, m = A.shape
 
-    C = np.empty_like(A)
+    # Build, for each row/column index, the list of remaining indices with that
+    # one removed, then combine them so that minors[i, j] is A with row i and
+    # column j deleted. This computes every minor's determinant with a single
+    # batched np.linalg.det call instead of looping in Python, while still using
+    # the same LAPACK routine (rather than a closed-form expansion) for each
+    # 2x2-or-larger determinant: expanding a determinant into products and
+    # differences directly is less accurate than LAPACK's pivoted elimination
+    # for the ill-conditioned matrices this function is applied to.
+    rows = np.array([np.delete(np.arange(n), i) for i in range(n)])
+    cols = np.array([np.delete(np.arange(m), j) for j in range(m)])
 
-    # TODO should be able to achieve this by creating a stack of of indicies
-    # that correspond to the minors, e.g. an index array (I) of shape
-    # (n, n, n - 1, n-1). Then something equivalent to np.linalg.det(A[I]) will
-    # be the cofactor, but the details are a bit tricky
-    for i in range(n):
-        for j in range(m):
-            minors = np.delete(np.delete(A, i, axis=0), j, axis=1)
-            sign = 1 if (i + j) % 2 == 0 else -1
-            C[i, j] = sign * np.linalg.det(minors)
+    minors = A[rows[:, None, :, None], cols[None, :, None, :]]
 
-    return C
+    # The checkerboard of +1/-1 cofactor signs only depends on the parity of
+    # i + j, so it is cheaper to read off the low bit than to exponentiate.
+    parity = (np.arange(n)[:, None] + np.arange(m)[None, :]) & 1
+    signs = 1 - 2 * parity
+
+    return signs * np.linalg.det(minors)
 
 
 def adjugate(C: npt.ArrayLike) -> np.ndarray:
