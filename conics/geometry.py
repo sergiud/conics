@@ -148,6 +148,9 @@ def projectively_unique(p: npt.ArrayLike, atol: float = 1e-4) -> np.ndarray:
     d = np.linalg.norm(c, axis=-1)
     m = np.isclose(d, 0, atol=atol)
 
-    # mark points as duplicate if cross product with an earlier point has 0 norm
-    duplicate = np.bincount(j, m) > 0
+    # mark points as duplicate if cross product with an earlier point has 0
+    # norm. minlength=n is required for n <= 1: np.triu_indices then returns
+    # empty i, j arrays, and np.bincount on an empty input returns a
+    # zero-length result instead of one entry per point.
+    duplicate = np.bincount(j, m, minlength=n) > 0
     return p[..., ~duplicate, :]

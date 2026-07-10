@@ -41,6 +41,14 @@ def test_projectively_unique_empty():
     assert a.shape == (0, 3)
 
 
+def test_projectively_unique_single_row():
+    # np.triu_indices(1, k=1) returns empty index arrays, so np.bincount on
+    # them used to return a zero-length array instead of one entry for the
+    # single input point, dropping it entirely.
+    a = projectively_unique([[1.0, 2.0, 1.0]])
+    np.testing.assert_array_equal(a, [[1.0, 2.0, 1.0]])
+
+
 def test_projectively_unique_all():
     a = projectively_unique([[0, 0, 0], [1, 1, 1]])
     np.testing.assert_array_equal(a, [[0, 0, 0]])
