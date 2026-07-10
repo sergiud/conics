@@ -16,8 +16,6 @@
 from __future__ import annotations
 
 from ._conic import Conic
-from ._utils import polygon_area
-from .geometry import hnormalized
 from .geometry import rot2d
 from scipy.optimize import least_squares
 import numpy as np
@@ -230,72 +228,104 @@ class Ellipse:
     def segment_area(self, line: npt.ArrayLike) -> float:
         """Computes the area of the region obtained as a result of intersecting the ellipse with a line.
 
-        If the ellipse is defined by a normalized homogeneous conic :math:`C`, such
-        that the center :math:`\\vec c` is negative, (i.e.
-        :math:`\\vec c^\\top C \\vec c < 0`), then this function computes the area
-        of the spaced defined by
-        :math:`{ \\vec p : \\vec p^\\top l < 0 \\land \\vec p^\\top C \\vec p < 0 }`.
+        This ellipse's normalized homogeneous conic :math:`C` (see
+        :meth:`to_conic`) evaluates to exactly :math:`-1` at its own center in
+        homogeneous coordinates, :math:`\\vec c=(c_x,c_y,1)^\\top`, i.e.
+        :math:`\\vec c^\\top C \\vec c=-1`, and is negative everywhere else
+        inside the ellipse. Writing points in homogeneous coordinates as
+        :math:`\\vec p=(x,y,1)^\\top` as well, this function computes the area
+        of the set
+        :math:`\\{ \\vec p : \\vec p^\\top \\vec l < 0 \\land \\vec p^\\top C \\vec p < 0 \\}`.
 
-        If the line does not intersect or tangents the ellipse, then either zero
-        or the full ellipse area will be returned.
+        If the line does not intersect or is tangent to the ellipse, then
+        either zero or the full ellipse area is returned. If the line is
+        degenerate, having no direction (:math:`\\vec l=(0,0,d)^\\top`), the
+        sign of :math:`d` alone decides between the same two outcomes.
+
+        The area is computed by mapping the ellipse to the unit circle
+        through the affine transform that rotates into the ellipse-local
+        frame and scales each axis by the corresponding semi-axis length.
+        This transform has constant Jacobian determinant :math:`\\text{major}
+        \\cdot\\text{minor}`, so any area computed in the transformed (unit
+        circle) space scales back to the ellipse by that factor. The line
+        maps to another line under this transform, at some perpendicular
+        distance :math:`h` from the origin (in units of the unit circle's
+        radius).
+
+        For :math:`h<1` the cap it cuts off on the side not containing the
+        origin can be rotated, without changing its area, so that the cutting
+        line becomes the vertical line :math:`x=h`. The cap area then follows
+        by integrating the circle's cross-sectional width over
+        :math:`x\\in[h,1]`:
+
+        .. math::
+            \\int_h^1 2\\sqrt{1-x^2}\\,dx = \\arccos h-h\\sqrt{1-h^2}
+            \\enspace,
+
+        from which the requested half-plane area follows directly depending
+        on which side of the line the origin (the ellipse center) falls on.
+
+        :math:`\\arccos h` is evaluated as :math:`\\operatorname{atan2}(s, h)`
+        with :math:`s=\\sqrt{1-h^2}`, and :math:`s` itself is computed from the
+        factored product :math:`(1-h)(1+h)` rather than :math:`1-h^2`. Squaring
+        :math:`h` first and then subtracting from 1 cancels leading digits once
+        :math:`h` approaches 1 (a near-tangent line), and can even drive the
+        argument of the square root slightly negative. The factored form
+        halves that cancellation and stays nonnegative.
+
+        The integral derivation above, the :math:`\\operatorname{atan2}`
+        rewrite, and the affine scaling by :math:`\\text{major}\\cdot\\text{minor}`
+        are all cross-checked symbolically and numerically in
+        ``scripts/derive_segment_area.py``.
 
         Parameters
         ----------
         line : array_like (3,)
-            An array of representing a homogeneous line to define the conic section area.
+            A homogeneous line cutting the ellipse into the two regions this
+            method chooses between.
 
         Returns
         -------
         area : float
-            The area of the intersection of the interior of this eclipse and the
+            The area of the intersection of the interior of this ellipse and the
             negative half plane of line. This value is nonnegative and bounded
             by the total ellipse area.
         """
         line = np.asarray(line, "f8")
-        conic = self.to_conic()
         center_distance = line[:2] @ self.center + line[-1]
-        intersections = conic.intersect_line(line)
 
-        if intersections.shape[0] == 2:
-            point_from, point_to = hnormalized(intersections)
+        major_minor = self.major_minor
+        R = rot2d(self.alpha)
+        direction = line[:2] @ R
+        A, B = direction * major_minor
+        C = center_distance
+        norm = np.hypot(A, B)
+        total_area = self.area
 
-            # create a polygon of the points in area, and compute the area in
-            # the triangle between center and both points
-            poly_shape = np.stack((point_from, point_to, self.center))
-            poly_area = polygon_area(poly_shape)
+        if norm == 0:
+            return total_area if center_distance < 0 else 0.0
 
-            # note compute the interior angle from both points
-            cx, cy = np.moveaxis(poly_shape[:2, :] - self.center[None], -1, 0)
-            interior_angles = np.atan2(cy, cx) - self.alpha
+        # Perpendicular distance from the origin to the transformed line, in
+        # units of the unit circle's radius.
+        h = np.abs(C) / norm
 
-            # using the interior angles, compute the section area from the major
-            # axis to each point
-            major, minor = self.major_minor
-            norm_y = major * np.sin(interior_angles)
-            norm_x = minor * np.cos(interior_angles)
-            norm_area = (major * minor) / 2
-            area_from, area_to = np.moveaxis(
-                np.atan2(norm_y, norm_x) * norm_area, -1, 0
-            )
+        if h >= 1:
+            return total_area if center_distance < 0 else 0.0
 
-            # now subtract to get just the sector area, then subtract the
-            # polygon area, and finally obtain the remainder with respect to the
-            # total area for when these are negative (indicating a reverse
-            # direction) of the intersection points
-            sector_area = area_to - area_from
-            total_area = self.area
-            area = (sector_area - poly_area) % total_area
+        # Area of the unit-circle cap not containing the origin. sqrt(1 - h**2)
+        # is computed from (1 - h) * (1 + h) rather than 1 - h**2 to avoid
+        # cancellation as h approaches 1 (a near-tangent line), and arccos(h)
+        # is replaced by the equivalent atan2(s, h), which does not require
+        # its argument to be clipped to [-1, 1].
+        s = np.sqrt(np.maximum(0.0, (1 - h) * (1 + h)))
+        cap_area = np.prod(major_minor) * (np.arctan2(s, h) - h * s)
 
-            # if the center is negative, but the area is less than half, need to
-            # invert
-            if (center_distance < 0) == (sector_area * 2 < total_area):
-                return total_area - area
+        # The origin (the ellipse center) lies in {expr < 0} exactly when C
+        # (the value of the transformed line at the origin) is negative.
+        if C < 0:
+            return total_area - cap_area
 
-            return area
-        elif center_distance > 0:
-            return 0.0
-
-        return self.area
+        return cap_area
 
     @staticmethod
     def from_conic(C: Conic) -> Ellipse:

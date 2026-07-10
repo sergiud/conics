@@ -20,7 +20,11 @@ from conics import Conic
 from conics import Ellipse
 from conics.fitting import fit_dlt
 from conics.fitting import fit_nievergelt
+from conics.geometry import rot2d
+from scipy import integrate
 import numpy as np
+import pytest
+import warnings
 
 
 def test_ellipse_fitting():
@@ -133,6 +137,31 @@ def test_ellipse_segment_area() -> None:
     assert np.isclose(ellipse.segment_area([-1, 1, 3]), 0.0)
 
 
+def test_ellipse_segment_area_tangent() -> None:
+    # A line exactly tangent to the ellipse (h == 1) is a boundary case of
+    # the h >= 1 branch. test_circle_segment_area exercises this only for a
+    # circle, where major == minor never puts the major * minor axis scaling
+    # to the test, so it is repeated here for a non-circular ellipse.
+    ellipse = Ellipse([0, 0], [2, 1], 0.0)
+    # tangent at the major-axis vertex (2, 0), center on the negative side
+    assert np.isclose(ellipse.segment_area([1, 0, -2]), 2 * np.pi)
+    # tangent at the major-axis vertex (-2, 0), center on the positive side
+    assert np.isclose(ellipse.segment_area([1, 0, 2]), 0.0)
+    # tangent at the minor-axis vertex (0, 1), center on the negative side
+    assert np.isclose(ellipse.segment_area([0, 1, -1]), 2 * np.pi)
+    # tangent at the minor-axis vertex (0, -1), center on the positive side
+    assert np.isclose(ellipse.segment_area([0, 1, 1]), 0.0)
+
+
+def test_ellipse_segment_area_degenerate_line() -> None:
+    # line[:2] == (0, 0) makes the transformed line direction vanish
+    # regardless of rotation or axis scaling, so norm == 0 and the sign of
+    # center_distance alone decides between the full area and zero.
+    ellipse = Ellipse([0, 0], [2, 1], 0.3)
+    assert np.isclose(ellipse.segment_area([0, 0, -1]), ellipse.area)
+    assert np.isclose(ellipse.segment_area([0, 0, 1]), 0.0)
+
+
 def test_circle_segment_area() -> None:
     circle = Ellipse([0, 0], [1, 1], 0.0)
     # tangent, ouside of circle, so should be zero
@@ -141,3 +170,91 @@ def test_circle_segment_area() -> None:
     assert np.isclose(circle.segment_area([-1, -1, 1]), np.pi / 4 - 1 / 2)
     # inverse of that
     assert np.isclose(circle.segment_area([1, 1, -1]), np.pi * 3 / 4 + 1 / 2)
+
+
+def _quadrature_segment_area(ellipse, line):
+    """Independently integrates the half plane area cut from an ellipse.
+
+    Used as a ground truth for segment_area() that does not share any code
+    with its implementation.
+    """
+    major, minor = ellipse.major_minor
+    R = rot2d(ellipse.alpha)
+
+    def indicator(y, x):
+        p = np.array([x, y]) @ R.T + ellipse.center
+        return 1.0 if (p @ line[:2] + line[2]) < 0 else 0.0
+
+    def y_lo(x):
+        return -minor * np.sqrt(np.maximum(0.0, 1 - (x / major) ** 2))
+
+    def y_hi(x):
+        return minor * np.sqrt(np.maximum(0.0, 1 - (x / major) ** 2))
+
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', integrate.IntegrationWarning)
+        value, _ = integrate.dblquad(indicator, -major, major, y_lo, y_hi)
+
+    return value
+
+
+@pytest.mark.parametrize(
+    'line',
+    [
+        np.array([1.0, 0.0, -1.8]),
+        np.array([np.cos(2.5), np.sin(2.5), 0.9]),
+    ],
+)
+def test_ellipse_segment_area_asymmetric_cut(line) -> None:
+    # A line offset that is not symmetric about the ellipse center used to
+    # make segment_area return the area of the wrong side (its
+    # region-selection condition was inverted). The reference is computed by
+    # direct numerical integration, independently of segment_area's own
+    # implementation.
+    ellipse = Ellipse([0, 0], [2, 1], 0.0)
+
+    area = ellipse.segment_area(line)
+    expected = _quadrature_segment_area(ellipse, line)
+
+    np.testing.assert_allclose(area, expected, atol=1e-3)
+
+
+def _unit_circle_cap_quadrature(h: float) -> float:
+    """Independently integrates the area of the unit circle cap {x > h}.
+
+    Used as a ground truth that does not share segment_area()'s own
+    arccos/arctan2 evaluation, so it stays a valid reference even for h close
+    to 1.
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', integrate.IntegrationWarning)
+        value, _ = integrate.quad(
+            lambda x: 2 * np.sqrt(np.maximum(0.0, 1 - x**2)),
+            h,
+            1.0,
+            epsabs=1e-14,
+            epsrel=1e-14,
+            limit=200,
+        )
+
+    return value
+
+
+@pytest.mark.parametrize('h', [1 - 1e-6, 1 - 1e-8])
+def test_ellipse_segment_area_near_tangent_cut(h) -> None:
+    # A near-tangent cut drives h = |C| / norm close to 1. Computing
+    # arccos(h) - h * sqrt(1 - h**2) directly loses precision there because
+    # 1 - h**2 cancels leading digits (h**2 rounds close to 1 before the
+    # subtraction). At h = 1 - 1e-8 that formula is off by about 2%. The
+    # reference is computed independently by 1-D quadrature.
+    circle = Ellipse([0, 0], [1, 1], 0.0)
+    # {-x + h < 0} == {x > h}, the cap not containing the center, so
+    # segment_area returns the cap area directly rather than
+    # total_area - cap_area, keeping the tiny cap value from being swallowed
+    # by cancellation against the much larger total area.
+    line = np.array([-1.0, 0.0, h])
+
+    area = circle.segment_area(line)
+    expected = _unit_circle_cap_quadrature(h)
+
+    np.testing.assert_allclose(area, expected, rtol=1e-3)
