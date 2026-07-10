@@ -15,6 +15,7 @@
 # limitations under the License.
 from __future__ import annotations
 
+from .geometry import line_intersection
 from .geometry import projectively_unique
 from .geometry import rot2d
 from collections.abc import Sequence
@@ -61,7 +62,7 @@ def concentric_conics_vanishing_line(
     evecs = evecs[..., ::-1]
 
     x1, x2, x3 = evecs.T
-    v = np.cross(x2, x3)
+    v = line_intersection(x2, x3)
 
     return x1, v
 
