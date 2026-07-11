@@ -222,6 +222,12 @@ def _panel_segment_area(ax, colors):
     side = line[:2] @ boundary.T + line[-1]
     cap_pts = boundary[side < 0]
 
+    # Crop the drawn line to the chord it forms inside the ellipse instead of
+    # an arbitrary fixed span, which would protrude past the boundary by a
+    # different amount on either side.
+    crossings = hnormalized(e.to_conic().intersect_line(line))
+    crossings = crossings[np.argsort(crossings[:, 0])]
+
     ax.add_patch(
         mpatches.Ellipse(
             e.center,
@@ -233,9 +239,7 @@ def _panel_segment_area(ax, colors):
         )
     )
     ax.fill(*cap_pts.T, color=colors['aqua'], alpha=0.45, zorder=2)
-
-    xs = np.linspace(-2.5, 2.5, 2)
-    ax.plot(xs, 0.75 - 0 * xs, color=colors['orange'], lw=2, ls='--')
+    ax.plot(*crossings.T, color=colors['orange'], lw=2, ls='--')
 
     ax.annotate(
         f'{pct:.0f}% of the\nellipse area',
