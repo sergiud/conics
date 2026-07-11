@@ -40,8 +40,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Colors are taken from the categorical palette slots "blue", "aqua", "red",
-# and the chrome/ink roles, each with a light- and dark-surface step so the
-# two renderings stay readable on their respective background.
+# "violet", "orange", and the chrome/ink roles, each with a light- and
+# dark-surface step so the two renderings stay readable on their respective
+# background.
 _THEMES = {
     'light': {
         'ink': '#0b0b0b',
@@ -50,6 +51,7 @@ _THEMES = {
         'blue': '#2a78d6',
         'aqua': '#1baf7a',
         'red': '#e34948',
+        'violet': '#4a3aa7',
         'orange': '#eb6834',
     },
     'dark': {
@@ -59,6 +61,7 @@ _THEMES = {
         'blue': '#3987e5',
         'aqua': '#199e70',
         'red': '#e66767',
+        'violet': '#9085e9',
         'orange': '#d95926',
     },
 }
@@ -147,9 +150,10 @@ def _panel_intersection(ax, colors):
     )
     ax.scatter(
         *inter.T,
-        s=60,
-        color=colors['ink'],
+        s=70,
+        color=colors['violet'],
         edgecolor=colors['ink'],
+        linewidth=1,
         zorder=3,
         label='intersections',
     )
