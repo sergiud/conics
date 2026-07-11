@@ -5,26 +5,11 @@
 [![Documentation Status](https://readthedocs.org/projects/conics/badge/?version=latest)](https://conics.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - Version](https://img.shields.io/pypi/v/conics)
 
-A conic (or conic section) is the curve you get by slicing a cone with a
-plane. Depending on the angle of the cut, that curve is a circle, an
-ellipse, a parabola, or a hyperbola. These shapes show up constantly in
-science and engineering, from the orbits of planets to the way a camera
-projects a circle into an ellipse, so working with them well is worth doing
-properly instead of ad hoc.
-
 Conics is a Python library for constructing, fitting, transforming, and
 intersecting conic sections. It covers the numerically tricky parts, such
 as fitting a conic to noisy points and refining that fit geometrically
 rather than only algebraically, so applications can work with conics
 directly instead of re-deriving that math.
-
-<div align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/static/teaser-dark.svg">
-    <source media="(prefers-color-scheme: light)" srcset="docs/static/teaser-light.svg">
-    <img alt="Four panels illustrating conics: fitting and refining an ellipse to noisy points, intersecting conics, fitting and refining a parabola, and measuring the area a line cuts off an ellipse." src="docs/static/teaser-light.svg">
-  </picture>
-</div>
 
 ## Features
 
@@ -38,6 +23,14 @@ directly instead of re-deriving that math.
 * 5 DoF pose estimation of the supporting plane of an ellipse, e.g., to
   recover the plane a circular marker lies on from its elliptical image
   projection
+
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/static/teaser-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/static/teaser-light.svg">
+    <img alt="Four panels illustrating conics: fitting and refining an ellipse to noisy points, intersecting conics, fitting and refining a parabola, and measuring the area a line cuts off an ellipse." src="docs/static/teaser-light.svg">
+  </picture>
+</div>
 
 ## Getting Started
 
