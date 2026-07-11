@@ -40,9 +40,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Colors are taken from the categorical palette slots "blue", "aqua", "red",
-# "violet", "orange", and the chrome/ink roles, each with a light- and
-# dark-surface step so the two renderings stay readable on their respective
-# background.
+# "violet", "orange", "green", and the chrome/ink roles, each with a light-
+# and dark-surface step so the two renderings stay readable on their
+# respective background.
 _THEMES = {
     'light': {
         'ink': '#0b0b0b',
@@ -53,6 +53,7 @@ _THEMES = {
         'red': '#e34948',
         'violet': '#4a3aa7',
         'orange': '#eb6834',
+        'green': '#008300',
     },
     'dark': {
         'ink': '#ffffff',
@@ -63,6 +64,7 @@ _THEMES = {
         'red': '#e66767',
         'violet': '#9085e9',
         'orange': '#d95926',
+        'green': '#008300',
     },
 }
 
@@ -83,9 +85,9 @@ def _panel_ellipse(ax, colors, rng):
     # non-linear refinement noticeably part ways.
     theta = rng.uniform(-0.4, 2.5 * np.pi / 1.15, 11)
     circle_pts = np.column_stack((np.cos(theta), np.sin(theta)))
-    pts = (
-        circle_pts * true_ellipse.major_minor
-    ) @ rot2d(true_ellipse.alpha).T + true_ellipse.center
+    pts = (circle_pts * true_ellipse.major_minor) @ rot2d(
+        true_ellipse.alpha
+    ).T + true_ellipse.center
     pts += rng.normal(scale=0.13, size=pts.shape)
 
     C = fit_nievergelt(pts, type='ellipse', scale=True)
@@ -137,10 +139,30 @@ def _as_mpl_ellipse(c: Conic, **kwargs):
 
 
 def _panel_intersection(ax, colors):
-    c1 = Conic.from_circle([0, 0], 1)
-    c2 = Conic.from_circle([0.9, 0.4], 1.1)
+    c1_center, c1_r = [0, 0], 1
+    c2_center, c2_r = [0.9, 0.4], 1.1
+    c1 = Conic.from_circle(c1_center, c1_r)
+    c2 = Conic.from_circle(c2_center, c2_r)
 
-    inter = hnormalized(c1.intersect(c2))
+    # A third, larger circle enclosing both c1 and c2 and internally tangent
+    # to each touches each at a single point instead of two, on the far side
+    # of each circle from the other, away from where c1 and c2 themselves
+    # cross. Its center is equidistant from c1_center and c2_center by
+    # exactly R3 minus the respective radius, i.e., it lies on both circles
+    # of radius R3 - c1_r around c1_center and R3 - c2_r around c2_center,
+    # so the enclosing circle's center is found the same way any two-conic
+    # intersection is: by intersecting those two auxiliary circles.
+    R3 = 2.0
+    aux1 = Conic.from_circle(c1_center, R3 - c1_r)
+    aux2 = Conic.from_circle(c2_center, R3 - c2_r)
+    candidates = hnormalized(aux1.intersect(aux2))
+    c3_center = candidates[np.argmin(candidates[:, 1])]
+    c3 = Conic.from_circle(c3_center, R3)
+
+    crossings = hnormalized(c1.intersect(c2))
+    tangent1 = hnormalized(c1.intersect(c3))
+    tangent2 = hnormalized(c2.intersect(c3))
+    points = np.vstack((crossings, tangent1, tangent2))
 
     ax.add_patch(
         _as_mpl_ellipse(c1, facecolor='none', edgecolor=colors['blue'], lw=2.2)
@@ -148,16 +170,19 @@ def _panel_intersection(ax, colors):
     ax.add_patch(
         _as_mpl_ellipse(c2, facecolor='none', edgecolor=colors['orange'], lw=2.2)
     )
+    ax.add_patch(
+        _as_mpl_ellipse(c3, facecolor='none', edgecolor=colors['green'], lw=2.2)
+    )
     ax.scatter(
-        *inter.T,
+        *points.T,
         s=28,
         color=colors['violet'],
         zorder=3,
         label='intersections',
     )
-    ax.set_xlim(-1.6, 2.5)
-    ax.set_ylim(-1.6, 2.0)
-    ax.set_title('Intersect two conics')
+    ax.set_xlim(-1.4, 3.1)
+    ax.set_ylim(-2.6, 2.0)
+    ax.set_title('Intersect conics')
     ax.legend(
         loc='upper center',
         bbox_to_anchor=(0.5, -0.02),
@@ -186,13 +211,17 @@ def _panel_parabola(ax, colors):
 
     contact_pts = p_refined.contact(pts)
 
-    ax.contour(X, Y, Z, colors=[colors['blue']], levels=[0], linewidths=2, linestyles='--')
+    ax.contour(
+        X, Y, Z, colors=[colors['blue']], levels=[0], linewidths=2, linestyles='--'
+    )
     ax.contour(X, Y, Z_refined, colors=[colors['red']], levels=[0], linewidths=2.2)
 
     for xy in np.dstack((contact_pts, pts)):
         ax.plot(*xy, '--', c=colors['muted'], lw=1, zorder=1)
 
-    ax.scatter(x, y, s=28, color=colors['ink_secondary'], zorder=3, label='observations')
+    ax.scatter(
+        x, y, s=28, color=colors['ink_secondary'], zorder=3, label='observations'
+    )
     ax.scatter(
         *contact_pts.T,
         s=28,

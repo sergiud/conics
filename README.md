@@ -18,11 +18,13 @@ as fitting a conic to noisy points and refining that fit geometrically
 rather than only algebraically, so applications can work with conics
 directly instead of re-deriving that math.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/static/teaser-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/static/teaser-light.svg">
-  <img alt="Four panels illustrating conics: fitting and refining an ellipse to noisy points, intersecting two conics, fitting and refining a parabola, and measuring the area a line cuts off an ellipse." src="docs/static/teaser-light.svg">
-</picture>
+<div align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/static/teaser-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/static/teaser-light.svg">
+    <img alt="Four panels illustrating conics: fitting and refining an ellipse to noisy points, intersecting conics, fitting and refining a parabola, and measuring the area a line cuts off an ellipse." src="docs/static/teaser-light.svg">
+  </picture>
+</div>
 
 ## Features
 
