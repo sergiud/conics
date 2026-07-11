@@ -150,10 +150,8 @@ def _panel_intersection(ax, colors):
     )
     ax.scatter(
         *inter.T,
-        s=70,
+        s=28,
         color=colors['violet'],
-        edgecolor=colors['ink'],
-        linewidth=1,
         zorder=3,
         label='intersections',
     )
