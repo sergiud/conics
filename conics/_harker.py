@@ -15,6 +15,8 @@
 # limitations under the License.
 
 from ._conic import Conic
+from ._parabola import Parabola
+from ._conic import rot2d
 import numpy as np
 import scipy.linalg
 
@@ -44,14 +46,18 @@ def _build_scatter_matrices(pts):
 
 
 def _build_reduced_scatter_matrix(S11, S21, S22):
+    print(S11, S21)
     S11invS21T = np.linalg.solve(S11, S21.T)
+    #S11invS21T, _, _, _ = np.linalg.lstsq(S11, S21.T, rcond=None)
     M = S22 - S21 @ S11invS21T
 
     return M, S11invS21T
 
 
-def _compute_parabola(M):
+def _compute_parabola(M, beta=1e5):
+    # FIXME Minimal set of points is 4 for arbitrarily oriented parabolas
     evals, evecs = np.linalg.eigh(M)
+    print(evals)
 
     evecs = evecs[..., ::-1]
     evals = evals[::-1]
@@ -65,7 +71,7 @@ def _compute_parabola(M):
     gamma5 = -4 * e13 * e31 + 2 * e12 * e32 - 4 * e11 * e33  # t
     gamma6 = e32**2 - 4 * e31 * e33  # constant term
 
-    alpha1, alpha2 = evals[:2] ** 2
+    alpha1, alpha2 = evals[:2] ** 2 + beta
     alpha3 = alpha1 * alpha2
 
     k1 = 4 * gamma3 * gamma6 - gamma5**2
@@ -82,15 +88,28 @@ def _compute_parabola(M):
     K2 = 4 * (
         (2 * gamma2 * k2 + 4 * k8) * alpha3
         + gamma1 * k4 * alpha1**2
-        + gamma3 * K1 * alpha2**2
+        + gamma3 * k1 * alpha2**2
     )
     K3 = 2 * k7 * k8
     K4 = k5 * k8
 
     r = np.roots([K4, K3, K2, K1, K0])
+    print(r)
+
+    tol = 1e-8  # relative to root magnitude; tune as needed
+    is_real = np.abs(r.imag) <= tol * np.maximum(np.abs(r.real), 1.0)
+    real_roots = r[is_real].real
+
+    if real_roots.size == 0:
+        raise ValueError('no real Lagrange multiplier found; degenerate fit')
+
+    mu = real_roots[np.argmin(np.abs(real_roots))]
+
+    r = mu
 
     u = k5 * r**2 + k7 * r + 4 * alpha3
-    r_by_u = np.divide(r, u, out=u, where=u != 0)
+    print(u)
+    r_by_u = r / u#np.divide(r, u, out=u, where=u != 0)
 
     s = 2 * r_by_u * (k3 * r + alpha1 * gamma4)
     t = r_by_u * (k6 * r + 2 * alpha2 * gamma5)
@@ -100,10 +119,13 @@ def _compute_parabola(M):
     theta = evecs[..., ::-1] @ ust
     a, b, c = theta
     error = b**2 - 4 * a * c
+    # FIXME Return error for scoring
+    print(error)
 
     k = np.argmin(np.abs(error))
 
-    return np.real(theta[..., k])
+    theta_k = theta[..., k]
+    return theta_k#np.real_if_close(theta_k)
 
 
 def _partial_backsubstitute(S1121):
@@ -260,6 +282,92 @@ def fit_harker(pts, type):
 
     return C
 
+def _solve_homogeneous_quadratic(A, B, C):
+    """Solve A*s^2 + B*s*t + C*t^2 = 0 for (s, t) up to scale.
+
+    Returns a list of up to two (s, t) tuples. Complex results indicate no
+    real solution exists (e.g. no real parabola passes through the 4 points).
+    """
+    if A != 0:
+        disc = B**2 - 4 * A * C
+        sqrt_disc = np.sqrt(complex(disc))
+        r1, r2 = (-B + np.array([sqrt_disc, -sqrt_disc])) / (2 * A)
+        return [(r1, 1.0), (r2, 1.0)]
+    elif B != 0:
+        # A == 0: t*(B*s + C*t) = 0 -> t=0 (pure e_a), or s = -(C/B)*t
+        return [(1.0, 0.0), (-C / B, 1.0)]
+    else:
+        # A == B == 0: only t == 0 works unless C is also 0 (fully degenerate)
+        return [(1.0, 0.0)]
+
+
+def _compute_parabola_minimal(M):
+    """Closed-form parabola(s) through an exact 4-point fit.
+
+    M has (generically) a 2-D near-null space for 4 points; every conic in
+    that pencil fits all 4 points exactly, so this finds where the pencil
+    intersects the parabola constraint b^2 - 4ac = 0, rather than minimizing
+    an error that is identically zero everywhere (which is why routing this
+    case through the general quartic-based solver fails).
+    """
+    evals, evecs = np.linalg.eigh(M)  # ascending eigenvalues
+    e_a = evecs[:, 0]  # smallest eigenvalue
+    e_b = evecs[:, 1]  # second-smallest eigenvalue
+
+    ea1, ea2, ea3 = e_a
+    eb1, eb2, eb3 = e_b
+
+    A = ea2**2 - 4 * ea1 * ea3
+    B = 2 * ea2 * eb2 - 4 * (ea1 * eb3 + eb1 * ea3)
+    C = eb2**2 - 4 * eb1 * eb3
+
+    solutions = _solve_homogeneous_quadratic(A, B, C)
+
+    z2_candidates = []
+    for s, t in solutions:
+        if np.iscomplex(s) or np.iscomplex(t):
+            continue  # no real parabola for this branch
+        z2_candidates.append(np.real(s) * e_a + np.real(t) * e_b)
+
+    return z2_candidates
+
+
+def fit_harker_minimal4(pts, type='parabola'):
+    """Minimal-sample closed-form fit for RANSAC hypothesis generation.
+
+    Returns a list of Conic candidates (up to 2 for a parabola from 4
+    points), since a 4-point sample generally admits two solutions and
+    disambiguation is left to MSAC/RANSAC scoring against the full point set.
+    """
+    if type != 'parabola':
+        raise NotImplementedError('minimal solver currently only supports parabola')
+
+    if len(pts) != 4:
+        raise ValueError('minimal parabola fit requires exactly 4 points')
+
+    mean = np.mean(pts, axis=0)
+    centered = pts - mean
+    scale = np.sqrt(np.mean(centered**2))
+    scale_inv = 1 / scale
+    normalized = centered * scale_inv
+
+    S11, S21, S22, x2m, xym, y2m = _build_scatter_matrices(
+        normalized.astype(scale.dtype)
+    )
+    M, S11invS21T = _build_reduced_scatter_matrix(S11, S21, S22)
+
+    z2_candidates = _compute_parabola_minimal(M)
+
+    conics = []
+    for z2 in z2_candidates:
+        z = _backsubstitute(S11invS21T, z2, x2m, xym, y2m)
+        print('z', z)
+        C = _denormalize(z, scale_inv, mean)
+        print(C)
+        conics.append(C)
+
+    return conics
+
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
@@ -271,24 +379,53 @@ if __name__ == '__main__':
     x = np.cos(t) + np.random.normal(scale=0.05, size=t.size)
     y = np.sin(t) + np.random.normal(scale=0.05, size=t.size)
 
-    # y = np.linspace(-5, 4, num=250)
-    # x = -y**2 + 2 * y - 5 + np.random.normal(scale=0.25, size=y.size)
+    y = np.linspace(-5, 4, num=8)
+    x = -y**2 + 2*y - 5   # exact, no noise term
+    #pts = np.column_stack((x, y))
+
+    y = np.linspace(-5, 4, num=4)
+    x = -y**2 - 2 * y - 5 + np.random.normal(scale=0.5, size=y.size)
 
     # x = [-6.6, -2.8, -0.2, 0.4, 1.2, 1.4]
     # y = [8.8, 5.4, 3.6, 7.8, 3.4, 4.8]
 
-    # pts = np.column_stack((x, y)) @ rot2d(np.pi / 4 * 0).T
-    pts = np.column_stack((x, y))
+    x = np.linspace(0, 7, num=5)
+    y = 1e-2 * (x - 3.5)**2 + 1 + np.random.normal(scale=5e-4, size=x.size) # gentle, monotonic-curvature "almost linear" parabola
+    pts = np.column_stack((x, y)) @ rot2d(-np.pi/3).T
+    #pts = np.column_stack((x, y))
 
-    C = fit_harker(pts, type='ellipse')
+    #C1, C2 = fit_harker_minimal4(pts, type='parabola')
+    C1 = fit_harker(pts, type='parabola')
+    print(C1)
+    C2 = C1
+
+    P = Parabola(*C1.to_parabola())
+    R = rot2d(P.alpha)
+    #y = np.linspace(-1, 1)
+    #x = y**2/(2*P.p)
+    p = P.p
+    vertex = P.vertex
+
+    #pts1 = np.column_stack((x, y)) @ R.T + P.vertex
+
+    pts_local_data = (pts - vertex) @ R          # transform real data into local frame
+    y_min, y_max = pts_local_data[:, 1].min(), pts_local_data[:, 1].max()
+    margin = 0.05 * (y_max - y_min)
+    y_local = np.linspace(y_min - margin, y_max + margin, 500)
+    x_local = y_local**2 / (2 * p)
+
+    pts1 = np.column_stack((x_local, y_local)) @ R.T + vertex
 
     X, Y = np.meshgrid(
         np.linspace(np.min(pts[:, 0]) - 1, np.max(pts[:, 0]) + 1),
         np.linspace(-1 + np.min(pts[:, 1]), np.max(pts[:, 1]) + 1),
     )
-    Z = C(np.column_stack((X.ravel(), Y.ravel())))
+    Z1 = C1(np.column_stack((X.ravel(), Y.ravel())))
+    Z2 = C2(np.column_stack((X.ravel(), Y.ravel())))
 
     plt.figure()
-    plt.contour(X, Y, Z.reshape(X.shape), levels=0)
+    #plt.contour(X, Y, Z1.reshape(X.shape), levels=0)
+    #plt.contour(X, Y, Z2.reshape(X.shape), levels=0)
+    plt.plot(*pts1.T)
     plt.scatter(*pts.T)
     plt.show()
